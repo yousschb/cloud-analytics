@@ -1,4 +1,4 @@
-!pip install --upgrade google-cloud-storage
+from google.cloud import bigquery
 
 # Spécifiez votre clé d'API Google Cloud
 key = "AIzaSyDCG3GZnJCh18SCKfWMbFdZl1sDL01USp0"
