@@ -1,5 +1,3 @@
-!pip install google-cloud-bigquery
-
 from google.cloud import bigquery
 
 # Spécifiez votre clé d'API Google Cloud
