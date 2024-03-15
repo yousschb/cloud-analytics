@@ -1,4 +1,4 @@
-from google.cloud import bigquery
+pip install --upgrade google-cloud-bigquery
 
 # Spécifiez votre clé d'API Google Cloud
 key = "AIzaSyDCG3GZnJCh18SCKfWMbFdZl1sDL01USp0"
