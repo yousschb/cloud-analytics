@@ -24,16 +24,45 @@ def get_movie_details(tmdb_id):
     else:
         return None
 
+# Liste déroulante pour sélectionner le genre de film
+genre_choices = ["---", "Action", "Comedy", "Drama", "Horror", "Science Fiction"]
+selected_genre = st.selectbox("Select genre", genre_choices)
+
+# Curseur pour sélectionner la note moyenne
+average_rating = st.slider("Select minimum average rating", min_value=0.0, max_value=5.0, step=0.1, value=3.0)
+
+# Curseur pour sélectionner l'année de sortie minimale
+release_year = st.slider("Select minimum release year", min_value=1900, max_value=2022, value=1980)
+
+
 def main():
     movie_name = st.text_input("Enter keywords of the movie name:")
-    
+
+    # Liste déroulante pour sélectionner le genre de film
+    genre_choices = ["---", "Action", "Comedy", "Drama", "Horror", "Science Fiction"]
+    selected_genre = st.selectbox("Select genre", genre_choices)
+
+    # Curseur pour sélectionner la note moyenne
+    average_rating = st.slider("Select minimum average rating", min_value=0.0, max_value=5.0, step=0.1, value=3.0)
+
+    # Curseur pour sélectionner l'année de sortie minimale
+    release_year = st.slider("Select minimum release year", min_value=1900, max_value=2022, value=1980)
+
     if movie_name:  # Vérifie si l'utilisateur a entré des mots-clés avant de lancer la recherche
-        # Recherche de tous les résultats de nom de film contenant les mots clés
+        # Construire la requête SQL de base
         query = f"""
             SELECT title
             FROM `caa-assignement-1-417215.Movies.Infos`
             WHERE LOWER(title) LIKE LOWER('%{movie_name}%')
         """
+
+        # Ajouter les filtres SQL en fonction des sélections de l'utilisateur
+        if selected_genre != "---":
+            query += f" AND LOWER(genre) LIKE LOWER('%{selected_genre}%')"
+
+        query += f" AND rating > {average_rating}"  # Filtrer par note moyenne
+        query += f" AND EXTRACT(YEAR FROM release_date) > {release_year}"  # Filtrer par année de sortie
+
         query_job = client.query(query)
         results = query_job.result()
 
@@ -80,3 +109,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
