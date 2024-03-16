@@ -24,11 +24,11 @@ with left_column:
 
 # Curseur pour sélectionner la note moyenne
 with left_column:
-    average_rating = st.slider("Select minimum average rating", min_value=0.0, max_value=5.0, step=0.1, value=3.0)
+    average_rating = st.slider("Select minimum average rating", min_value=0.0, max_value=5.0, step=0.1, value=4.0)
 
 # Curseur pour sélectionner l'année de sortie minimale
 with left_column:
-    release_year = st.slider("Select minimum release year", min_value=1900, max_value=2022, value=1980)
+    release_year = st.slider("Select minimum release year", min_value=1900, max_value=2022, value=2019)
 
 # Afficher les résultats dans la colonne de droite
 with right_column:
@@ -38,9 +38,9 @@ with right_column:
     FROM `caa-assignement-1-417215.Movies.Infos` AS m
     JOIN (
         SELECT movieId, AVG(rating) AS avg_rating
-        FROM `caa-assignement-1-417215.Movies.ratings` AS r
+        FROM `caa-assignement-1-417215.Movies.ratings`
         GROUP BY movieId
-    )  ON m.movieId = r.movieId
+    ) AS r ON m.movieId = r.movieId
     WHERE 1=1
     """
 
