@@ -49,29 +49,6 @@ def build_query():
     
     return base_query
 
-# Exécuter la requête de filtrage et afficher les résultats
-def update_results():
-    query = build_query()
-    if query.strip() == "":
-        return "Please provide search criteria."
-    else:
-        query_job = client.query(query)
-        results = query_job.result()
-        if results.total_rows == 0:
-            return "No movies found matching the criteria."
-        else:
-            formatted_results = [row[0] for row in results]  # Extraire les valeurs des résultats
-            return formatted_results
-
-# Bouton pour mettre à jour les résultats
-if st.button("Search"):
-    results = update_results()
-    if isinstance(results, str):
-        st.write(results)
-    else:
-        st.write("### Results:")
-        for movie_title in results:
-            st.write(f"- {movie_title}")
 
 # Importation de la bibliothèque d'icônes
 from streamlit.components.v1 import html
@@ -107,7 +84,7 @@ def generate_stars(rating):
     return stars_html
 
 # Bouton pour mettre à jour les résultats
-if st.button("Update Results"):
+if st.button("Search"):
     results = update_results()
     if isinstance(results, str):
         st.write(results)
