@@ -38,15 +38,18 @@ release_year = st.slider("Select minimum release year", min_value=1900, max_valu
 def main():
     movie_name = st.text_input("Enter keywords of the movie name:")
 
-    # Liste déroulante pour sélectionner le genre de film
+    # Clé unique pour la liste déroulante du genre de film
+    genre_key = "genre_selectbox"
     genre_choices = ["---", "Action", "Comedy", "Drama", "Horror", "Science Fiction"]
-    selected_genre = st.selectbox("Select genre", genre_choices)
+    selected_genre = st.selectbox("Select genre", genre_choices, key=genre_key)
 
     # Curseur pour sélectionner la note moyenne
-    average_rating = st.slider("Select minimum average rating", min_value=0.0, max_value=5.0, step=0.1, value=3.0)
+    rating_key = "average_rating_slider"
+    average_rating = st.slider("Select minimum average rating", min_value=0.0, max_value=5.0, step=0.1, value=3.0, key=rating_key)
 
     # Curseur pour sélectionner l'année de sortie minimale
-    release_year = st.slider("Select minimum release year", min_value=1900, max_value=2022, value=1980)
+    release_year_key = "release_year_slider"
+    release_year = st.slider("Select minimum release year", min_value=1900, max_value=2022, value=1980, key=release_year_key)
 
     if movie_name:  # Vérifie si l'utilisateur a entré des mots-clés avant de lancer la recherche
         # Construire la requête SQL de base
