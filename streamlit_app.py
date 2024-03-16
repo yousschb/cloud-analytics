@@ -24,11 +24,11 @@ with left_column:
 
 # Curseur pour sélectionner la note moyenne
 with left_column:
-    average_rating = st.slider("Select minimum average rating", min_value=0.0, max_value=5.0, step=0.1, value=4.0)
+    average_rating = st.slider("Select minimum average rating", min_value=0.0, max_value=5.0, step=0.1, value=3.0)
 
 # Curseur pour sélectionner l'année de sortie minimale
 with left_column:
-    release_year = st.slider("Select minimum release year", min_value=1900, max_value=2022, value=2019)
+    release_year = st.slider("Select minimum release year", min_value=1900, max_value=2022, value=1980)
 
 # Afficher les résultats dans la colonne de droite
 with right_column:
