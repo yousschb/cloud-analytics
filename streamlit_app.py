@@ -49,49 +49,6 @@ def build_query():
     
     return base_query
 
-
-from google.cloud import bigquery
-import streamlit as st
-
-# Spécifiez le chemin vers votre fichier de clé d'API Google Cloud
-key_path = "caa-assignement-1-417215-e1c1db571b4e.json"
-
-# Créez un client BigQuery en utilisant le fichier de clé d'API
-client = bigquery.Client.from_service_account_json(key_path)
-
-# Titre de l'application
-st.title("Movie Database Search")
-
-# Zone de recherche de titre de film
-search_query = st.text_input("Search for movie titles", "")
-
-# Liste déroulante pour sélectionner le genre de film
-genre_choices = ["---", "Action", "Comedy", "Drama", "Horror", "Science Fiction"]
-selected_genre = st.selectbox("Select genre", genre_choices)
-
-# Curseur pour sélectionner la note moyenne
-average_rating = st.slider("Select minimum average rating", min_value=0.0, max_value=5.0, step=0.1, value=3.0)
-
-# Curseur pour sélectionner l'année de sortie minimale
-release_year = st.slider("Select minimum release year", min_value=1900, max_value=2022, value=1980)
-
-# Construction de la requête SQL de base
-def build_query():
-    query = """
-    SELECT m.title, AVG(r.rating) AS avg_rating
-    FROM `caa-assignement-1-417215.Movies.Infos` AS m
-    JOIN `caa-assignement-1-417215.Movies.ratings` AS r ON m.movieId = r.movieId
-    WHERE 1=1
-    """
-    
-    if search_query:
-        query += f" AND LOWER(m.title) LIKE LOWER('%{search_query}%')"
-    if selected_genre != "---":
-        query += f" AND LOWER(m.genres) LIKE LOWER('%{selected_genre}%')"
-    query += f" AND r.rating IS NOT NULL AND r.rating >= {average_rating} AND m.release_year >= {release_year}"
-    query += " GROUP BY m.title"
-    return query
-
 # Exécuter la requête de filtrage et afficher les résultats
 def update_results():
     query = build_query()
@@ -103,27 +60,8 @@ def update_results():
         if results.total_rows == 0:
             return "No movies found matching the criteria."
         else:
-            formatted_results = [(row["title"], row.get("avg_rating")) for row in results]
+            formatted_results = [row[0] for row in results]  # Extraire les valeurs des résultats
             return formatted_results
-
-# Fonction pour générer des étoiles en fonction de la note
-def generate_stars(rating):
-    if rating is None:  # Vérification si la note est nulle
-        return "No rating available"
-    
-    filled_stars = int(rating)
-    half_star = rating - filled_stars >= 0.5
-    empty_stars = 5 - filled_stars - (1 if half_star else 0)
-    
-    stars_html = ""
-    for _ in range(filled_stars):
-        stars_html += "★ "
-    if half_star:
-        stars_html += "☆ "
-    for _ in range(empty_stars):
-        stars_html += "☆ "
-    
-    return stars_html
 
 # Bouton pour mettre à jour les résultats
 if st.button("Search"):
@@ -132,5 +70,5 @@ if st.button("Search"):
         st.write(results)
     else:
         st.write("### Results:")
-        for movie_title, avg_rating in results:
-            st.write(f"- {movie_title} - Average Rating: {generate_stars(avg_rating)}")
+        for movie_title in results:
+            st.write(f"- {movie_title}")
