@@ -2,10 +2,11 @@ from google.cloud import bigquery
 import streamlit as st
 
 # Chemin vers le fichier JSON de la clé du compte de service
-key_path = "caa-assignement-1-417215-e1c1db571b4e"
+key_path = "/Users/mac/Desktop/assignment1-data/caa-assignement-1-417215-e1c1db571b4e.json"
 
 # Créer un client BigQuery en utilisant le fichier de clé d'API Google Cloud
 client = bigquery.Client.from_service_account_json(key_path)
+
 
 # Titre de l'application
 st.title("Movie Database Search")
