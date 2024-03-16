@@ -30,9 +30,9 @@ release_year = st.slider("Select minimum release year", min_value=1900, max_valu
 # Construction de la requête SQL de base
 def build_query():
     base_query = """
-    SELECT m.title, m.tmdbId, AVG(r.rating) as avg_rating
+    SELECT m.title, m.tmdbId, m.language, AVG(r.rating) as avg_rating
     FROM `caa-assignement-1-417215.Movies.Infos` AS m
-    JOIN `caa-assignement-1-417215.Movies.ratings` AS r ON m.movieId = r.movieId
+    JOIN `caa-assignement-1-417215.Movies.ratings` AS r ON m.tmdbId = r.movieId
     WHERE 1=1
     """
     # Ajouter les filtres en fonction des entrées de l'utilisateur
@@ -46,7 +46,7 @@ def build_query():
     if filters:
         base_query += " AND " + " AND ".join(filters)
     
-    base_query += f" GROUP BY m.title, m.tmdbId HAVING AVG(r.rating) >= {average_rating}"  # Utilisation de f-string pour insérer la variable
+    base_query += f" GROUP BY m.title, m.tmdbId, m.language HAVING AVG(r.rating) >= {average_rating}"  # Utilisation de f-string pour insérer la variable
     
     return base_query
 
@@ -63,6 +63,19 @@ def update_results():
         else:
             return results
 
+# Fonction pour obtenir les détails du film à partir de l'API TMDb
+def get_movie_details(movie_id):
+    url = f"https://api.themoviedb.org/3/movie/{movie_id}?language=en-US"
+    headers = {
+        "accept": "application/json",
+        "Authorization": f"Bearer {TMDB_API_KEY}"
+    }
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return "Failed to fetch movie details"
+
 # Afficher les résultats de la recherche
 if st.button("Search"):
     results = update_results()
@@ -73,17 +86,9 @@ if st.button("Search"):
         for row in results:
             movie_title = row[0]
             tmdb_id = row[1]
-            avg_rating = row[2]
+            movie_language = row[2]
             if st.button(movie_title):
-                url = f"https://api.themoviedb.org/3/movie/{tmdb_id}?language=en-US"
-                headers = {
-                    "accept": "application/json",
-                    "Authorization": f"Bearer {TMDB_API_KEY}"
-                }
-                response = requests.get(url, headers=headers)
-                if response.status_code == 200:
-                    movie_details = response.json()
+                # Afficher les détails du film sélectionné dans un panneau déroulant
+                with st.expander(f"Details of {movie_title}"):
+                    movie_details = get_movie_details(tmdb_id)
                     st.write(movie_details)
-                else:
-                    st.write("Failed to fetch movie details")
-
