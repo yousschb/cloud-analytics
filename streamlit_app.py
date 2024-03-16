@@ -39,13 +39,7 @@ def main():
     movie_options = [row.title for row in results]
 
     # Afficher la liste des résultats
-    if movie_options:
-        st.write("### Search Results:")
-        for movie_option in movie_options:
-            if st.button(movie_option):
-                selected_movie = movie_option
-    else:
-        st.write("No movies found matching the provided keywords.")
+    selected_movie = st.selectbox("Select a movie:", movie_options)
 
     if st.button("Get Movie Details") and selected_movie:  # Ajoutez un bouton pour déclencher la recherche
         # Recherche du tmdb_id correspondant au nom du film sélectionné
