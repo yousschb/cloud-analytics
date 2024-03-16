@@ -63,22 +63,6 @@ def update_results():
         else:
             return results
 
-from google.cloud import bigquery
-import streamlit as st
-import requests
-
-# Spécifiez le chemin vers votre fichier de clé d'API Google Cloud
-key_path = "caa-assignement-1-417215-e1c1db571b4e.json"
-
-# Créez un client BigQuery en utilisant le fichier de clé d'API
-client = bigquery.Client.from_service_account_json(key_path)
-
-# Titre de l'application
-st.title("Movie Database Search")
-
-# Clé API TMDb
-TMDB_API_KEY = "c1cf246019092e64d25ae5e3f25a3933"
-
 # Fonction pour obtenir les détails du film à partir de l'API TMDb
 def get_movie_details(title):
     base_url = "https://api.themoviedb.org/3/search/movie"
