@@ -99,28 +99,13 @@ def main():
         for movie in movie_options:
             st.write(movie)
 
-    # Filter by language (SQL)
-    language = st.text_input("Filter by language (SQL):")
-    if language:
+    # Curseur pour sélectionner la note moyenne
+    average_rating = st.slider("Select minimum average rating", min_value=0.0, max_value=5.0, step=0.1, value=3.0)
+    if average_rating:
         query = f"""
             SELECT title
             FROM `caa-assignement-1-417215.Movies.Infos`
-            WHERE LOWER(language) LIKE LOWER('%{language}%')
-        """
-        query_job = client.query(query)
-        results = query_job.result()
-        movie_options = [row.title for row in results]
-        st.write("Movies in the selected language:")
-        for movie in movie_options:
-            st.write(movie)
-
-    # Filter by average rating of a movie (SQL)
-    rating = st.text_input("Filter by average rating of a movie (SQL):")
-    if rating:
-        query = f"""
-            SELECT title
-            FROM `caa-assignement-1-417215.Movies.Infos`
-            WHERE rating > {rating}
+            WHERE rating > {average_rating}
         """
         query_job = client.query(query)
         results = query_job.result()
@@ -129,8 +114,8 @@ def main():
         for movie in movie_options:
             st.write(movie)
 
-    # Filter by release year (e.g., after 2019)
-    release_year = st.text_input("Filter by release year (e.g., after 2019):")
+    # Curseur pour sélectionner l'année de sortie minimale
+    release_year = st.slider("Select minimum release year", min_value=1900, max_value=2022, value=1980)
     if release_year:
         query = f"""
             SELECT title
