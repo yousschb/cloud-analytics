@@ -64,44 +64,25 @@ def update_results():
             return results
 
 # Fonction pour obtenir les détails du film à partir de l'API TMDb
-def get_movie_details(title):
-    base_url = "https://api.themoviedb.org/3/search/movie"
+# Fonction pour obtenir les films populaires du jour à partir de l'API TMDb
+def get_trending_movies():
+    base_url = "https://api.themoviedb.org/3/trending/all/day"
     params = {
-        "api_key": TMDB_API_KEY,
-        "query": title
+        "api_key": TMDB_API_KEY
     }
     response = requests.get(base_url, params=params)
     if response.status_code == 200:
         data = response.json()
-        if data['total_results'] > 0:
-            movie_id = data['results'][0]['id']
-            movie_details_url = f"https://api.themoviedb.org/3/movie/{movie_id}"
-            params = {
-                "api_key": TMDB_API_KEY
-            }
-            movie_response = requests.get(movie_details_url, params=params)
-            if movie_response.status_code == 200:
-                movie_data = movie_response.json()
-                return movie_data
-            else:
-                return "Failed to fetch movie details"
-        else:
-            return "Movie not found"
+        return data['results']
     else:
-        return "Failed to fetch movie details"
+        return "Failed to fetch trending movies"
 
-# Afficher les résultats de la recherche
-if st.button("Search"):
-    results = update_results()
-    if isinstance(results, str):
-        st.write(results)
-    else:
-        st.write("### Results:")
-        for row in results:
-            movie_title = row[0]
-            avg_rating = row[1]
-            if st.button(movie_title):
-                # Afficher les détails du film sélectionné dans un panneau déroulant
-                with st.expander(f"Details of {movie_title}"):
-                    movie_details = get_movie_details(movie_title)
-                    st.write(movie_details)
+# Afficher les résultats des films populaires du jour
+trending_movies = get_trending_movies()
+if isinstance(trending_movies, str):
+    st.write(trending_movies)
+else:
+    st.write("### Trending Movies Today:")
+    for movie in trending_movies:
+        st.write(f"- {movie['title']} ({movie['release_date']})")
+
