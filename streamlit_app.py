@@ -60,22 +60,31 @@ def update_results():
         else:
             return results
 
+# Importation de la bibliothèque d'icônes
+from streamlit.components.v1 import html
+
 # Fonction pour générer des étoiles en fonction de la note
 def generate_stars(avg_rating):
     if avg_rating is None:  # Vérification si la note est nulle
         return "No rating available"
     
     filled_stars = int(avg_rating)
-    half_star = avg_rating - filled_stars >= 0.5
-    empty_stars = 5 - filled_stars - (1 if half_star else 0)
+    remainder = avg_rating - filled_stars
     
-    stars_html = ""
-    for _ in range(filled_stars):
-        stars_html += "★ "
-    if half_star:
-        stars_html += "☆ "
-    for _ in range(empty_stars):
-        stars_html += "☆ "
+    # Génération des étoiles pleines
+    stars_html = "★" * filled_stars
+    
+    # Ajout de l'étoile à moitié si nécessaire
+    if remainder >= 0.25:
+        stars_html += "¼"
+    if remainder >= 0.5:
+        stars_html += "★"
+    if remainder >= 0.75:
+        stars_html += "¾"
+    
+    # Calcul des étoiles vides restantes
+    empty_stars = 5 - filled_stars
+    stars_html += "☆" * empty_stars
     
     return stars_html
 
@@ -90,4 +99,3 @@ if st.button("Search"):
             movie_title = row[0]
             avg_rating = row[1]
             st.write(f"- {movie_title} - Average Rating: {generate_stars(avg_rating)}")
-
