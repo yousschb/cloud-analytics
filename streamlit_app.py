@@ -90,7 +90,7 @@ def main():
         query = f"""
             SELECT title
             FROM `caa-assignement-1-417215.Movies.Infos`
-            WHERE LOWER(genre) LIKE LOWER('%{selected_genre}%')
+            WHERE LOWER(genres) LIKE LOWER('%{selected_genre}%')
         """
         query_job = client.query(query)
         results = query_job.result()
@@ -120,7 +120,7 @@ def main():
         query = f"""
             SELECT title
             FROM `caa-assignement-1-417215.Movies.Infos`
-            WHERE EXTRACT(YEAR FROM release_date) > {release_year}
+            WHERE release_year > {release_year}
         """
         query_job = client.query(query)
         results = query_job.result()
