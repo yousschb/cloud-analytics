@@ -26,7 +26,23 @@ for row in results:
 # Titre de l'application
 st.title("Movie Database Search")
 
-# Zone de texte pour la requête de l'utilisateur
-query = st.text_input("Search for movies:", "")
+# Afficher le champ de recherche pour les titres de films
+search_query = st.text_input("Search for movie titles", "")
 
+# Requête SQL pour l'autocomplétion des titres de films
+query = f"""
+SELECT title
+FROM `caa-assignement-1-417215.Movies.Infos`
+WHERE LOWER(title) LIKE LOWER('%{search_query}%')
+"""
+
+# Exécuter la requête
+query_job = client.query(query)
+
+# Récupérer les résultats de la requête
+query_results = query_job.result()
+
+# Afficher les résultats
+for row in query_results:
+    st.write(row)
 
