@@ -30,7 +30,7 @@ release_year = st.slider("Select minimum release year", min_value=1900, max_valu
 # Construction de la requête SQL de base
 def build_query():
     base_query = """
-    SELECT m.title, AVG(r.rating) as avg_rating
+    SELECT m.title, AVG(r.rating) as avg_rating, m.movieId
     FROM `caa-assignement-1-417215.Movies.Infos` AS m
     JOIN `caa-assignement-1-417215.Movies.ratings` AS r ON m.movieId = r.movieId
     WHERE 1=1
@@ -46,7 +46,7 @@ def build_query():
     if filters:
         base_query += " AND " + " AND ".join(filters)
     
-    base_query += f" GROUP BY m.title HAVING AVG(r.rating) >= {average_rating}"  # Utilisation de f-string pour insérer la variable
+    base_query += f" GROUP BY m.title, m.movieId HAVING AVG(r.rating) >= {average_rating}"  # Utilisation de f-string pour insérer la variable
     
     return base_query
 
@@ -64,29 +64,15 @@ def update_results():
             return results
 
 # Fonction pour obtenir les détails du film à partir de l'API TMDb
-def get_movie_details(title):
-    base_url = "https://api.themoviedb.org/3/search/movie"
+def get_movie_details(movie_id):
+    base_url = f"https://api.themoviedb.org/3/movie/{movie_id}"
     params = {
-        "api_key": TMDB_API_KEY,
-        "query": title
+        "api_key": TMDB_API_KEY
     }
     response = requests.get(base_url, params=params)
     if response.status_code == 200:
-        data = response.json()
-        if data['total_results'] > 0:
-            movie_id = data['results'][0]['id']
-            movie_details_url = f"https://api.themoviedb.org/3/movie/{movie_id}"
-            params = {
-                "api_key": TMDB_API_KEY
-            }
-            movie_response = requests.get(movie_details_url, params=params)
-            if movie_response.status_code == 200:
-                movie_data = movie_response.json()
-                return movie_data
-            else:
-                return "Failed to fetch movie details"
-        else:
-            return "Movie not found"
+        movie_data = response.json()
+        return movie_data
     else:
         return "Failed to fetch movie details"
 
@@ -100,8 +86,9 @@ if st.button("Search"):
         for row in results:
             movie_title = row[0]
             avg_rating = row[1]
+            movie_id = row[2]
             if st.button(movie_title):
                 # Afficher les détails du film sélectionné dans un panneau déroulant
                 with st.expander(f"Details of {movie_title}"):
-                    movie_details = get_movie_details(movie_title)
+                    movie_details = get_movie_details(movie_id)
                     st.write(movie_details)
