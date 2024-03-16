@@ -22,3 +22,17 @@ results = query_job.result()
 # Affichez les résultats
 for row in results:
     print(row["title"])
+
+# Titre de l'application
+st.title("Movie Database Search")
+
+# Zone de texte pour la requête de l'utilisateur
+query = st.text_input("Search for movies:", "")
+
+# Bouton pour exécuter la requête
+if st.button("Search"):
+    # Exécutez la requête SQL en fonction de la recherche de l'utilisateur
+    # et affichez les résultats
+    # Ajoutez votre logique SQL ici
+    # par exemple : query_results = client.query("SELECT * FROM ...")
+    # puis affichez les résultats : for row in query_results: st.write(row)
