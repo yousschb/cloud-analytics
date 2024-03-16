@@ -1,5 +1,6 @@
 from google.cloud import bigquery
 import streamlit as st
+from streamlit.components.v1 import html
 
 # Spécifiez le chemin vers votre fichier de clé d'API Google Cloud
 key_path = "caa-assignement-1-417215-e1c1db571b4e.json"
@@ -80,8 +81,6 @@ def generate_stars(avg_rating):
     stars_html += "☆ " * empty_stars
     
     return stars_html
-
-
 
 # Bouton pour mettre à jour les résultats
 if st.button("Search"):
