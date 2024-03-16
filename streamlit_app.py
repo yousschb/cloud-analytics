@@ -42,9 +42,10 @@ def build_query():
     if filters:
         base_query += " AND " + " AND ".join(filters)
     
-    base_query += " GROUP BY m.title HAVING AVG(r.rating) >= {average_rating}"  # Ajout de la condition HAVING
+    base_query += f" GROUP BY m.title HAVING AVG(r.rating) >= {average_rating}"  # Utilisation de f-string pour insérer la variable
     
     return base_query
+
 
 # Exécuter la requête de filtrage et afficher les résultats
 def update_results():
