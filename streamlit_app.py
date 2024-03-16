@@ -48,7 +48,8 @@ query_params = {
 }
 
 # Exécuter la requête de filtrage
-query_job = client.query(base_query)
+query_job = client.query(base_query, query_params=query_params)
+
 
 # Afficher les résultats
 results = query_job.result()
