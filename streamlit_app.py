@@ -72,3 +72,47 @@ if st.button("Search"):
         st.write("### Results:")
         for movie_title in results:
             st.write(f"- {movie_title}")
+
+# Importation de la bibliothèque d'icônes
+from streamlit.components.v1 import html
+
+# Exécuter la requête de filtrage et afficher les résultats
+def update_results():
+    query = build_query()
+    if query.strip() == "":
+        return "Please provide search criteria."
+    else:
+        query_job = client.query(query)
+        results = query_job.result()
+        if results.total_rows == 0:
+            return "No movies found matching the criteria."
+        else:
+            formatted_results = [(row[0], row[1]) for row in results]  # Extraire les valeurs des résultats
+            return formatted_results
+
+# Fonction pour générer des étoiles en fonction de la note
+def generate_stars(rating):
+    filled_stars = int(rating)
+    half_star = rating - filled_stars >= 0.5
+    empty_stars = 5 - filled_stars - (1 if half_star else 0)
+    
+    stars_html = ""
+    for _ in range(filled_stars):
+        stars_html += "★ "
+    if half_star:
+        stars_html += "☆ "
+    for _ in range(empty_stars):
+        stars_html += "☆ "
+    
+    return stars_html
+
+# Bouton pour mettre à jour les résultats
+if st.button("Update Results"):
+    results = update_results()
+    if isinstance(results, str):
+        st.write(results)
+    else:
+        st.write("### Results:")
+        for movie_title, avg_rating in results:
+            st.write(f"- {movie_title} - Average Rating: {generate_stars(avg_rating)}")
+
