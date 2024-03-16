@@ -1,12 +1,23 @@
 from google.cloud import bigquery
 import streamlit as st
-import requests
+from tmdbv3api import TMDb
+from tmdbv3api import Movie
+
+# Clé API TMDb
+TMDB_API_KEY = "c1cf246019092e64d25ae5e3f25a3933"
 
 # Spécifiez le chemin vers votre fichier de clé d'API Google Cloud
 key_path = "caa-assignement-1-417215-e1c1db571b4e.json"
 
 # Créez un client BigQuery en utilisant le fichier de clé d'API
 client = bigquery.Client.from_service_account_json(key_path)
+
+# Initialisez l'objet TMDb avec votre jeton d'accès en lecture
+tmdb = TMDb()
+tmdb.api_key = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJjMWNmMjQ2MDE5MDkyZTY0ZDI1YWU1ZTNmMjVhMzkzMyIsInN1YiI6IjY1ZjU5ZTRlMDZmOTg0MDE3Y2M3Yzg3MCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.zF_TJxsIBuU9yHRlEQWEYYF7ZZg9ZoibgSnndHDhabA'
+
+# Initialisez l'objet Movie pour effectuer des requêtes sur les films
+movie = Movie()
 
 # Titre de l'application
 st.title("Movie Database Search")
@@ -25,7 +36,7 @@ average_rating = st.slider("Select minimum average rating", min_value=0.0, max_v
 release_year = st.slider("Select minimum release year", min_value=1900, max_value=2022, value=1980)
 
 # Construction de la requête SQL de base
-def build_query(search_query, selected_genre, average_rating, release_year):
+def build_query():
     base_query = """
     SELECT m.title, AVG(r.rating) as avg_rating
     FROM `caa-assignement-1-417215.Movies.Infos` AS m
@@ -49,8 +60,8 @@ def build_query(search_query, selected_genre, average_rating, release_year):
 
 
 # Exécuter la requête de filtrage et afficher les résultats
-def update_results(search_query, selected_genre, average_rating, release_year):
-    query = build_query(search_query, selected_genre, average_rating, release_year)
+def update_results():
+    query = build_query()
     if query.strip() == "":
         return "Please provide search criteria."
     else:
@@ -85,61 +96,9 @@ def generate_stars(avg_rating):
 
 
 
-# Clé API TMDb
-TMDB_API_KEY = "c1cf246019092e64d25ae5e3f25a3933"
-
-# Fonction pour obtenir les détails du film à partir de l'API TMDb
-def get_movie_details(title):
-    base_url = "https://api.themoviedb.org/3/search/movie"
-    params = {
-        "api_key": TMDB_API_KEY,
-        "query": title
-    }
-    response = requests.get(base_url, params=params)
-    if response.status_code == 200:
-        data = response.json()
-        if data['total_results'] > 0:
-            movie_id = data['results'][0]['id']
-            movie_details_url = f"https://api.themoviedb.org/3/movie/{movie_id}"
-            params = {
-                "api_key": TMDB_API_KEY,
-                "append_to_response": "credits"
-            }
-            movie_response = requests.get(movie_details_url, params=params)
-            if movie_response.status_code == 200:
-                movie_data = movie_response.json()
-                return format_movie_details(movie_data)
-            else:
-                return "Failed to fetch movie details"
-        else:
-            return "Movie not found"
-    else:
-        return "Failed to fetch movie details"
-
-def format_movie_details(movie_data):
-    title = movie_data.get("title", "Unknown")
-    overview = movie_data.get("overview", "No overview available")
-    poster_path = movie_data.get("poster_path")
-    cast = [cast_member["name"] for cast_member in movie_data.get("credits", {}).get("cast", [])[:5]]
-    genres = [genre["name"] for genre in movie_data.get("genres", [])]
-
-    details = f"**Title:** {title}\n"
-    details += f"**Overview:** {overview}\n"
-    details += f"**Genres:** {', '.join(genres)}\n"
-    details += f"**Cast:** {', '.join(cast)}\n"
-
-    if poster_path:
-        poster_url = f"https://image.tmdb.org/t/p/w500{poster_path}"
-        details += f"![Poster]({poster_url})\n"
-
-    return details
-
-
-
-
 # Afficher les résultats de la recherche
 if st.button("Search"):
-    results = update_results(search_query, selected_genre, average_rating, release_year)
+    results = update_results()
     if isinstance(results, str):
         st.write(results)
     else:
@@ -150,5 +109,7 @@ if st.button("Search"):
             if st.button(movie_title):
                 # Afficher les détails du film sélectionné dans un panneau déroulant
                 with st.expander(f"Details of {movie_title}"):
-                    movie_details = get_movie_details(movie_title)
-                    st.write(movie_details)
+                    search_result = movie.search(movie_title)
+                    if search_result:
+                        movie_details = movie.details(search_result[0].id)
+                        st.write(movie_details)
