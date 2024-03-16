@@ -89,8 +89,10 @@ def main():
     if selected_genre != "---":
         query = f"""
             SELECT title
-            FROM `caa-assignement-1-417215.Movies.Infos`
-            WHERE LOWER(genres) LIKE LOWER('%{selected_genre}%')
+            FROM `caa-assignement-1-417215.Movies.Infos` as m
+            JOIN `caa-assignement-1-417215.Movies.Ratings` as r
+            ON m.tmdbId = r.movieId
+            WHERE LOWER(m.genres) LIKE LOWER('%{selected_genre}%')
         """
         query_job = client.query(query)
         results = query_job.result()
@@ -103,9 +105,12 @@ def main():
     average_rating = st.slider("Select minimum average rating", min_value=0.0, max_value=5.0, step=0.1, value=3.0)
     if average_rating:
         query = f"""
-            SELECT title
-            FROM `caa-assignement-1-417215.Movies.Infos`
-            WHERE rating > {average_rating}
+            SELECT m.title, AVG(r.rating) as avg_rating
+            FROM `caa-assignement-1-417215.Movies.Infos` as m
+            JOIN `caa-assignement-1-417215.Movies.Ratings` as r
+            ON m.tmdbId = r.movieId
+            GROUP BY m.title
+            HAVING AVG(r.rating) > {average_rating}
         """
         query_job = client.query(query)
         results = query_job.result()
@@ -115,19 +120,18 @@ def main():
             st.write(movie)
 
     # Curseur pour sélectionner l'année de sortie minimale
-    release_year = st.slider("Select minimum release year", min_value=1900, max_value=2022, value=1980)
-    if release_year:
-        query = f"""
-            SELECT title
-            FROM `caa-assignement-1-417215.Movies.Infos`
-            WHERE release_year > {release_year}
-        """
-        query_job = client.query(query)
-        results = query_job.result()
-        movie_options = [row.title for row in results]
-        st.write("Movies released after the provided year:")
-        for movie in movie_options:
-            st.write(movie)
+release_year = st.slider("Select minimum release year", min_value=1900, max_value=2022, value=1980)
+if release_year:
+    query = f"""
+        SELECT m.title
+        FROM `caa-assignement-1-417215.Movies.Infos` as m
+        WHERE m.release_year > {release_year}
+    """
+    query_job = client.query(query)
+    results = query_job.result()
+    for row in results:
+        st.write(row.title)
 
 if __name__ == "__main__":
     main()
+
