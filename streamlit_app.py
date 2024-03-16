@@ -13,6 +13,7 @@ st.title("Movie Database Search")
 # Afficher le champ de recherche pour les titres de films
 search_query = st.text_input("Search for movie titles", "")
 
+
 # Requête SQL pour l'autocomplétion des titres de films
 autocomplete_query = f"""
 SELECT title
@@ -23,41 +24,82 @@ WHERE LOWER(title) LIKE LOWER('%{search_query}%')
 # Exécuter la requête d'autocomplétion
 autocomplete_results = client.query(autocomplete_query).result()
 
-# Afficher les résultats d'autocomplétion
-autocomplete_titles = [row["title"] for row in autocomplete_results]
-st.write("Autocomplete suggestions:", autocomplete_titles)
+# Afficher les résultats de l'autocomplétion
+for row in autocomplete_results:
+    st.write(row)
+
 
 # Liste déroulante pour sélectionner la langue
 language = st.selectbox("Select language", ["English", "French", "German", "Spanish", "Italian"])
 
+# Requête SQL pour filtrer par langue
+language_query = f"""
+SELECT title
+FROM `caa-assignement-1-417215.Movies.Infos`
+WHERE language = '{language}'
+"""
+
+# Exécuter la requête de filtrage par langue
+language_results = client.query(language_query).result()
+
+# Afficher les résultats du filtrage par langue
+for row in language_results:
+    st.write(row)
+
+
 # Liste déroulante pour sélectionner le genre de film
 genre = st.selectbox("Select genre", ["Action", "Comedy", "Drama", "Horror", "Science Fiction"])
+
+# Requête SQL pour filtrer par genre de film
+genre_query = f"""
+SELECT title
+FROM `caa-assignement-1-417215.Movies.Infos`
+WHERE genres LIKE '%{genre}%'
+"""
+
+# Exécuter la requête de filtrage par genre de film
+genre_results = client.query(genre_query).result()
+
+# Afficher les résultats du filtrage par genre de film
+for row in genre_results:
+    st.write(row)
+
 
 # Curseur pour sélectionner la note moyenne
 average_rating = st.slider("Select minimum average rating", min_value=0.0, max_value=5.0, step=0.1, value=4.0)
 
-# Curseur pour sélectionner l'année de sortie minimale
-release_year = st.slider("Select minimum release year", min_value=1900, max_value=2022, value=2019)
-
-# Requête SQL principale pour filtrer les films
-main_query = f"""
-SELECT title
+# Requête SQL pour filtrer par note moyenne
+rating_query = f"""
+SELECT m.title
 FROM `caa-assignement-1-417215.Movies.Infos` AS m
 JOIN (
     SELECT movieId, AVG(rating) AS avg_rating
     FROM `caa-assignement-1-417215.Ratings.Ratings`
     GROUP BY movieId
 ) AS r ON m.movieId = r.movieId
-WHERE LOWER(m.title) LIKE LOWER('%{search_query}%')
-    AND m.language = '{language}'
-    AND genres LIKE '%{genre}%'
-    AND r.avg_rating >= {average_rating}
-    AND m.release_year >= {release_year}
+WHERE r.avg_rating >= {average_rating}
 """
 
-# Exécuter la requête principale
-main_results = client.query(main_query).result()
+# Exécuter la requête de filtrage par note moyenne
+rating_results = client.query(rating_query).result()
 
-# Afficher les résultats principaux
-for row in main_results:
+# Afficher les résultats du filtrage par note moyenne
+for row in rating_results:
+    st.write(row)
+
+# Curseur pour sélectionner l'année de sortie minimale
+release_year = st.slider("Select minimum release year", min_value=1900, max_value=2022, value=2019)
+
+# Requête SQL pour filtrer par année de sortie
+year_query = f"""
+SELECT title
+FROM `caa-assignement-1-417215.Movies.Infos`
+WHERE release_year >= {release_year}
+"""
+
+# Exécuter la requête de filtrage par année de sortie
+year_results = client.query(year_query).result()
+
+# Afficher les résultats du filtrage par année de sortie
+for row in year_results:
     st.write(row)
