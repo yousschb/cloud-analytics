@@ -21,14 +21,32 @@ search_query = st.text_input("Search for movie titles", "")
 search_button = st.button("Search")
 
 # Fonction pour récupérer les détails d'un film à partir de son tmdbId et de la langue
-def get_movie_details(tmdb_id, language="en-US"):
+import requests
+
+def get_movie_details(tmdb_id, language="en-US", api_key="VOTRE_CLE_API_TMDB"):
     url = f"https://api.themoviedb.org/3/movie/{tmdb_id}"
-    params = {"language": language, "api_key": TMDB_API_KEY}
-    response = requests.get(url, params=params)
+    headers = {
+        "accept": "application/json",
+        "Authorization": f"Bearer {api_key}"
+    }
+    params = {"language": language}
+    response = requests.get(url, headers=headers, params=params)
     if response.status_code == 200:
         return response.json()
     else:
         return None
+
+def main():
+    tmdb_id = int(input("Entrez le tmdbId du film : "))
+    movie_details = get_movie_details(tmdb_id)
+    if movie_details:
+        print("Détails du film pour tmdbId", tmdb_id, ":", movie_details)
+    else:
+        print("Aucun détail trouvé pour le tmdbId", tmdb_id)
+
+if __name__ == "__main__":
+    main()
+
 
 # Fonction pour afficher les détails d'un film
 def display_movie_details(movie):
