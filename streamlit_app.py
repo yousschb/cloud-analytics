@@ -64,11 +64,14 @@ def update_results():
         if results.total_rows == 0:
             return "No movies found matching the criteria."
         else:
-            formatted_results = [(row[0], row[1]) for row in results]  # Extraire les valeurs des résultats
+            formatted_results = [(row[0], row.get(1)) for row in results]  # Utilisation de row.get() pour éviter l'erreur
             return formatted_results
 
 # Fonction pour générer des étoiles en fonction de la note
 def generate_stars(rating):
+    if rating is None:  # Vérification si la note est nulle
+        return "No rating available"
+    
     filled_stars = int(rating)
     half_star = rating - filled_stars >= 0.5
     empty_stars = 5 - filled_stars - (1 if half_star else 0)
@@ -92,4 +95,3 @@ if st.button("Search"):
         st.write("### Results:")
         for movie_title, avg_rating in results:
             st.write(f"- {movie_title} - Average Rating: {generate_stars(avg_rating)}")
-
