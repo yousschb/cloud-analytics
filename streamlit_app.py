@@ -44,23 +44,30 @@ def display_movie_details(movie):
 
 # Exécuter la requête de filtrage et afficher les résultats avec les détails des films
 def update_results():
+    st.write("Searching for movies...")
     if search_query:
+        st.write(f"Searching for movies with title containing '{search_query}'...")
         query = f"""
             SELECT m.tmdbId, m.language
             FROM `caa-assignement-1-417215.Movies.Infos` AS m
             WHERE LOWER(m.title) LIKE LOWER('%{search_query}%')
         """
+        st.write("Executing query:", query)
         query_job = client.query(query)
         results = query_job.result()
         if results.total_rows == 0:
             st.write("No movies found matching the search criteria.")
         else:
+            st.write("Movies found! Displaying details...")
             for row in results:
                 tmdb_id = row["tmdbId"]
                 language = row["language"]
+                st.write(f"Fetching details for movie with tmdbId '{tmdb_id}'...")
                 movie_details = get_movie_details(tmdb_id, language)
+                st.write("Movie details:", movie_details)
                 display_movie_details(movie_details)
 
 # Appel à la fonction update_results pour afficher les résultats dans l'interface utilisateur
 if search_button:
     update_results()
+
