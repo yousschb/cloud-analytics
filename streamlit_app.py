@@ -1,64 +1,59 @@
 from google.cloud import bigquery
 import streamlit as st
 
-# Spécifiez le chemin vers votre fichier de clé d'API Google Cloud
-key_path = "caa-assignement-1-417215-e1c1db571b4e.json"
-
-# Créez un client BigQuery en utilisant le fichier de clé d'API
-client = bigquery.Client.from_service_account_json(key_path)
+# Initialiser le client BigQuery
+client = bigquery.Client()
 
 # Titre de l'application
 st.title("Movie Database Search")
 
-# Organiser l'interface en deux colonnes
-left_column, right_column = st.columns(2)
-
 # Zone de recherche de titre de film
-with left_column:
-    search_query = st.text_input("Search for movie titles", "")
+search_query = st.text_input("Search for movie titles", "")
 
 # Liste déroulante pour sélectionner le genre de film
-with left_column:
-    genre_choices = ["---", "Action", "Comedy", "Drama", "Horror", "Science Fiction"]
-    selected_genre = st.selectbox("Select genre", genre_choices)
+genre_choices = ["---", "Action", "Comedy", "Drama", "Horror", "Science Fiction"]
+selected_genre = st.selectbox("Select genre", genre_choices)
 
 # Curseur pour sélectionner la note moyenne
-with left_column:
-    average_rating = st.slider("Select minimum average rating", min_value=0.0, max_value=5.0, step=0.1, value=3.0)
+average_rating = st.slider("Select minimum average rating", min_value=0.0, max_value=5.0, step=0.1, value=3.0)
 
 # Curseur pour sélectionner l'année de sortie minimale
-with left_column:
-    release_year = st.slider("Select minimum release year", min_value=1900, max_value=2022, value=1980)
+release_year = st.slider("Select minimum release year", min_value=1900, max_value=2022, value=1980)
 
-# Afficher les résultats dans la colonne de droite
-with right_column:
-    # Construction de la requête SQL de base
-    base_query = """
-    SELECT m.title
-    FROM `caa-assignement-1-417215.Movies.Infos` AS m
-    JOIN (
-        SELECT movieId, AVG(rating) AS avg_rating
-        FROM `caa-assignement-1-417215.Movies.ratings`
-        GROUP BY movieId
-    ) AS r ON m.movieId = r.movieId
-    WHERE 1=1
-    """
+# Construction de la requête SQL de base
+base_query = """
+SELECT m.title
+FROM `caa-assignement-1-417215.Movies.Infos` AS m
+JOIN (
+    SELECT movieId, AVG(rating) AS avg_rating
+    FROM `caa-assignement-1-417215.Movies.ratings`
+    GROUP BY movieId
+) AS r ON m.movieId = r.movieId
+WHERE 1=1
+"""
 
-    # Ajouter les filtres en fonction des entrées de l'utilisateur
-    if search_query:
-        base_query += f" AND LOWER(m.title) LIKE LOWER('%{search_query}%')"
+# Ajouter les filtres en fonction des entrées de l'utilisateur
+if search_query:
+    base_query += " AND LOWER(m.title) LIKE LOWER(@search_query)"
+if selected_genre != "---":
+    base_query += " AND LOWER(m.genres) LIKE LOWER(@selected_genre)"
+base_query += " AND r.avg_rating >= @average_rating AND m.release_year >= @release_year"
 
-    if selected_genre != "---":
-        base_query += f" AND LOWER(m.genres) LIKE LOWER('%{selected_genre}%')"
+# Préparer les paramètres de requête
+query_params = {
+    "search_query": f"%{search_query}%",
+    "selected_genre": f"%{selected_genre}%",
+    "average_rating": average_rating,
+    "release_year": release_year
+}
 
-    base_query += f"""
-    AND r.avg_rating >= {average_rating}
-    AND m.release_year >= {release_year}
-    """
+# Exécuter la requête de filtrage
+query_job = client.query(base_query, query_params=query_params)
 
-    # Exécuter la requête de filtrage
-    query_results = client.query(base_query).result()
-
-    # Afficher les résultats
-    for row in query_results:
+# Afficher les résultats
+results = query_job.result()
+if results.total_rows == 0:
+    st.write("No movies found matching the criteria.")
+else:
+    for row in results:
         st.write(row)
