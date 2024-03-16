@@ -74,7 +74,7 @@ def generate_stars(avg_rating):
     
     stars_html = ""
     for _ in range(filled_stars):
-        stars_html += "★ "
+        stars_html += "⯩"
     if half_star:
         stars_html += "☆ "
     for _ in range(empty_stars):
