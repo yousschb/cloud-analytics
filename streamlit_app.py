@@ -66,7 +66,8 @@ def generate_stars(avg_rating):
         return "No rating available"
     
     filled_stars = int(avg_rating)
-    half_star = avg_rating - filled_stars >= 0.5
+    remainder = avg_rating - filled_stars
+    half_star = remainder >= 0.25
     empty_stars = 5 - filled_stars - (1 if half_star else 0)
     
     stars_html = ""
@@ -74,7 +75,11 @@ def generate_stars(avg_rating):
         stars_html += "★ "
     if half_star:
         stars_html += "☆ "
-    for _ in range(empty_stars):
+        remainder -= 0.25
+    quarter_fill = min(int(remainder * 4), 3)
+    for _ in range(quarter_fill):
+        stars_html += "★"
+    for _ in range(empty_stars - quarter_fill):
         stars_html += "☆ "
     
     return stars_html
