@@ -38,7 +38,7 @@ with right_column:
     FROM `caa-assignement-1-417215.Movies.Infos` AS m
     JOIN (
         SELECT movieId, AVG(rating) AS avg_rating
-        FROM `caa-assignement-1-417215.Ratings.Ratings`
+        FROM `caa-assignement-1-417215.ratings.ratings`
         GROUP BY movieId
     ) AS r ON m.movieId = r.movieId
     WHERE 1=1
