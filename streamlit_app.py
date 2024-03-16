@@ -35,6 +35,8 @@ def main():
             st.write(f"Release Date: {movie_details['release_date']}")
             st.write(f"Genres: {', '.join(genre['name'] for genre in movie_details['genres'])}")
             st.write(f"Average Vote: {movie_details['vote_average']}")
+            if movie_details['poster_path']:
+                st.image(f"https://image.tmdb.org/t/p/w500/{movie_details['poster_path']}", caption="Movie Poster")
         else:
             st.write("No movie details found for the provided tmdbId.")
 
