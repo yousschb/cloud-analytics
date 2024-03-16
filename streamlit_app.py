@@ -23,44 +23,48 @@ average_rating = st.slider("Select minimum average rating", min_value=0.0, max_v
 # Curseur pour sélectionner l'année de sortie minimale
 release_year = st.slider("Select minimum release year", min_value=1900, max_value=2022, value=1980)
 
-# Construction de la requête SQL de base
-base_query = """
-SELECT m.title
-FROM `caa-assignement-1-417215.Movies.Infos` AS m
-JOIN (
-    SELECT movieId, AVG(rating) AS avg_rating
-    FROM `caa-assignement-1-417215.Movies.ratings`
-    GROUP BY movieId
-) AS r ON m.movieId = r.movieId
-"""
+# Événement on_change pour les widgets de recherche
+@st.cache
+def on_change():
+    # Construction de la requête SQL de base
+    base_query = """
+    SELECT m.title
+    FROM `caa-assignement-1-417215.Movies.Infos` AS m
+    JOIN (
+        SELECT movieId, AVG(rating) AS avg_rating
+        FROM `caa-assignement-1-417215.Movies.ratings`
+        GROUP BY movieId
+    ) AS r ON m.movieId = r.movieId
+    """
+    # Ajouter les filtres en fonction des entrées de l'utilisateur
+    if search_query or selected_genre != "---" or average_rating != 3.0 or release_year != 1980:
+        base_query += " WHERE 1=1"  # Début de la clause WHERE uniquement si des critères sont spécifiés
+        
+        if search_query:
+            base_query += " AND LOWER(m.title) LIKE LOWER(@search_query)"
+        if selected_genre != "---":
+            base_query += " AND LOWER(m.genres) LIKE LOWER(@selected_genre)"
+        base_query += " AND r.avg_rating >= @average_rating AND m.release_year >= @release_year"
 
-# Ajouter les filtres en fonction des entrées de l'utilisateur
-if search_query or selected_genre != "---" or average_rating != 3.0 or release_year != 1980:
-    base_query += " WHERE 1=1"  # Début de la clause WHERE uniquement si des critères sont spécifiés
-    
-    if search_query:
-        base_query += " AND LOWER(m.title) LIKE LOWER(@search_query)"
-    if selected_genre != "---":
-        base_query += " AND LOWER(m.genres) LIKE LOWER(@selected_genre)"
-    base_query += " AND r.avg_rating >= @average_rating AND m.release_year >= @release_year"
+        # Préparer les paramètres de requête
+        query_params = {
+            "search_query": f"%{search_query}%" if search_query else None,
+            "selected_genre": f"%{selected_genre}%" if selected_genre != "---" else None,
+            "average_rating": average_rating,
+            "release_year": release_year
+        }
 
-    # Préparer les paramètres de requête
-    query_params = {
-        "search_query": f"%{search_query}%" if search_query else None,
-        "selected_genre": f"%{selected_genre}%" if selected_genre != "---" else None,
-        "average_rating": average_rating,
-        "release_year": release_year
-    }
+        # Exécuter la requête de filtrage avec les paramètres
+        query_job = client.query(base_query, query_params=query_params)
 
-    # Exécuter la requête de filtrage avec les paramètres
-    query_job = client.query(base_query, query_params=query_params)
-
-    # Afficher les résultats
-    results = query_job.result()
-    if results.total_rows == 0:
-        st.write("No movies found matching the criteria.")
+        # Afficher les résultats
+        results = query_job.result()
+        if results.total_rows == 0:
+            st.write("No movies found matching the criteria.")
+        else:
+            for row in results:
+                st.write(row)
     else:
-        for row in results:
-            st.write(row)
-else:
-    st.write("Please provide search criteria.")
+        st.write("Please provide search criteria.")
+
+on_change()  # Appel initial pour afficher les résultats
