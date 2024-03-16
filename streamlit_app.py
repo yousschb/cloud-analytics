@@ -1,5 +1,6 @@
 from google.cloud import bigquery
 import streamlit as st
+import requests
 
 # Spécifiez le chemin vers votre fichier de clé d'API Google Cloud
 key_path = "caa-assignement-1-417215-e1c1db571b4e.json"
@@ -93,3 +94,35 @@ if st.button("Search"):
             movie_title = row[0]
             avg_rating = row[1]
             st.write(f"- {movie_title} - Average Rating: {generate_stars(avg_rating)}")
+
+
+
+# Clé API TMDb
+TMDB_API_KEY = "c1cf246019092e64d25ae5e3f25a3933"
+
+# Fonction pour obtenir les détails du film à partir de l'API TMDb
+def get_movie_details(title):
+    base_url = "https://api.themoviedb.org/3/search/movie"
+    params = {
+        "api_key": TMDB_API_KEY,
+        "query": title
+    }
+    response = requests.get(base_url, params=params)
+    if response.status_code == 200:
+        data = response.json()
+        if data['total_results'] > 0:
+            movie_id = data['results'][0]['id']
+            movie_details_url = f"https://api.themoviedb.org/3/movie/{movie_id}"
+            params = {
+                "api_key": TMDB_API_KEY
+            }
+            movie_response = requests.get(movie_details_url, params=params)
+            if movie_response.status_code == 200:
+                movie_data = movie_response.json()
+                return movie_data
+            else:
+                return "Failed to fetch movie details"
+        else:
+            return "Movie not found"
+    else:
+        return "Failed to fetch movie details"
