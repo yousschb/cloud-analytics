@@ -83,18 +83,6 @@ def generate_stars(avg_rating):
     
     return stars_html
 
-# Bouton pour mettre à jour les résultats
-if st.button("Search"):
-    results = update_results()
-    if isinstance(results, str):
-        st.write(results)
-    else:
-        st.write("### Results:")
-        for row in results:
-            movie_title = row[0]
-            avg_rating = row[1]
-            st.write(f"- {movie_title} - Average Rating: {generate_stars(avg_rating)}")
-
 
 
 # Clé API TMDb
@@ -126,3 +114,22 @@ def get_movie_details(title):
             return "Movie not found"
     else:
         return "Failed to fetch movie details"
+
+
+
+
+# Afficher les résultats de la recherche
+if st.button("Search"):
+    results = update_results()
+    if isinstance(results, str):
+        st.write(results)
+    else:
+        st.write("### Results:")
+        for row in results:
+            movie_title = row[0]
+            avg_rating = row[1]
+            if st.button(movie_title):
+                # Afficher les détails du film sélectionné dans un panneau déroulant
+                with st.expander(f"Details of {movie_title}"):
+                    movie_details = get_movie_details(movie_title)
+                    st.write(movie_details)
