@@ -36,12 +36,15 @@ def main():
     query_job = client.query(query)
     results = query_job.result()
 
-    movie_options = [row.title for row in results]
+    # Afficher les résultats à la suite les uns des autres
+    for row in results:
+        if st.button(row.title):
+            selected_movie = row.title
+            break
+    else:
+        selected_movie = None
 
-    # Afficher la liste des résultats
-    selected_movie = st.selectbox("Select a movie:", movie_options)
-
-    if st.button("Get Movie Details") and selected_movie:  # Ajoutez un bouton pour déclencher la recherche
+    if st.button("Get Movie Details") and selected_movie:
         # Recherche du tmdb_id correspondant au nom du film sélectionné
         query = f"""
             SELECT tmdbId
