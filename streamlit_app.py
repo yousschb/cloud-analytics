@@ -67,22 +67,22 @@ def generate_stars(avg_rating):
     
     filled_stars = int(avg_rating)
     remainder = avg_rating - filled_stars
-    half_star = remainder >= 0.25
-    empty_stars = 5 - filled_stars - (1 if half_star else 0)
+    half_star = remainder >= 0.5
+    quarter_fill = min(int(remainder * 4), 3) if half_star else 0
+    empty_stars = 5 - filled_stars - (1 if half_star else 0) - quarter_fill
     
     stars_html = ""
     for _ in range(filled_stars):
         stars_html += "★ "
     if half_star:
         stars_html += "☆ "
-        remainder -= 0.25
-    quarter_fill = min(int(remainder * 4), 3)
     for _ in range(quarter_fill):
-        stars_html += "★"
-    for _ in range(empty_stars - quarter_fill):
+        stars_html += "★¼"
+    for _ in range(empty_stars):
         stars_html += "☆ "
     
     return stars_html
+
 
 # Bouton pour mettre à jour les résultats
 if st.button("Search"):
