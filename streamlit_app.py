@@ -150,68 +150,28 @@ def main():
                             col2.write(f"Genres: {', '.join(genre['name'] for genre in movie_details['genres'])}")
                             col2.write(f"Average Vote: {movie_details['vote_average']}")
                             
-    # Ajout des options supplémentaires
-    st.write("Additional Options:")
-    
-    # Filter by language (SQL)
-    language = st.text_input("Filter by language (SQL):")
-    if language:
-        query = f"""
-            SELECT title
-            FROM `caa-assignement-1-417215.Movies.Infos`
-            WHERE LOWER(language) LIKE LOWER('%{language}%')
+    # Construction de la requête SQL de base avec les filtres des curseurs
+    def build_query():
+        base_query = """
+        SELECT m.title, AVG(r.rating) as avg_rating
+        FROM `caa-assignement-1-417215.Movies.Infos` AS m
+        JOIN `caa-assignement-1-417215.Movies.ratings` AS r ON m.movieId = r.movieId
+        WHERE 1=1
         """
-        query_job = client.query(query)
-        results = query_job.result()
-        movie_options = [row.title for row in results]
-        st.write("Movies in the selected language:")
-        for movie in movie_options:
-            st.write(movie)
-
-    # Filter by movie genre (SQL)
-    genre = st.text_input("Filter by movie genre (SQL):")
-    if genre:
-        query = f"""
-            SELECT title
-            FROM `caa-assignement-1-417215.Movies.Infos`
-            WHERE LOWER(genre) LIKE LOWER('%{genre}%')
-        """
-        query_job = client.query(query)
-        results = query_job.result()
-        movie_options = [row.title for row in results]
-        st.write("Movies in the selected genre:")
-        for movie in movie_options:
-            st.write(movie)
-
-    # Filter by average rating of a movie (SQL)
-    rating = st.text_input("Filter by average rating of a movie (SQL):")
-    if rating:
-        query = f"""
-            SELECT title
-            FROM `caa-assignement-1-417215.Movies.Infos`
-            WHERE rating > {rating}
-        """
-        query_job = client.query(query)
-        results = query_job.result()
-        movie_options = [row.title for row in results]
-        st.write("Movies with average rating higher than the provided value:")
-        for movie in movie_options:
-            st.write(movie)
-
-     # Filter by release year (e.g., after 2019)
-    release_year = st.text_input("Filter by release year (e.g., after 2019):")
-    if release_year:
-        query = f"""
-            SELECT title
-            FROM `caa-assignement-1-417215.Movies.Infos`
-            WHERE EXTRACT(YEAR FROM release_date) > {release_year}
-        """
-        query_job = client.query(query)
-        results = query_job.result()
-        movie_options = [row.title for row in results]
-        st.write("Movies released after the provided year:")
-        for movie in movie_options:
-            st.write(movie)
+        # Ajouter les filtres en fonction des entrées de l'utilisateur
+        filters = []
+        if search_query:
+            filters.append(f"LOWER(m.title) LIKE LOWER('%{search_query}%')")
+        if selected_genre != "---":
+            filters.append(f"LOWER(m.genres) LIKE LOWER('%{selected_genre}%')")
+        filters.append(f"m.release_year >= {release_year}")
+        
+        if filters:
+            base_query += " AND " + " AND ".join(filters)
+        
+        base_query += f" GROUP BY m.title HAVING AVG(r.rating) >= {average_rating}"  # Utilisation de f-string pour insérer la variable
+        
+        return base_query
 
 if __name__ == "__main__":
     main()
