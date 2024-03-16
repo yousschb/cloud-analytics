@@ -60,7 +60,8 @@ def update_results():
         if results.total_rows == 0:
             return "No movies found matching the criteria."
         else:
-            return results
+            formatted_results = [row[0] for row in results]  # Extraire les valeurs des résultats
+            return formatted_results
 
 # Bouton pour mettre à jour les résultats
 if st.button("Search"):
@@ -68,6 +69,6 @@ if st.button("Search"):
     if isinstance(results, str):
         st.write(results)
     else:
-        for row in results:
-            st.write(row)
-
+        st.write("### Results:")
+        for movie_title in results:
+            st.write(f"- {movie_title}")
