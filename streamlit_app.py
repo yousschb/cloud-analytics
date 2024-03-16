@@ -34,22 +34,26 @@ with left_column:
 with right_column:
     # Construction de la requête SQL de base
     base_query = """
-    SELECT title
-    FROM `caa-assignement-1-417215.Movies.Infos`
+    SELECT m.title
+    FROM `caa-assignement-1-417215.Movies.Infos` AS m
+    JOIN (
+        SELECT movieId, AVG(rating) AS avg_rating
+        FROM `caa-assignement-1-417215.Ratings.Ratings`
+        GROUP BY movieId
+    ) AS r ON m.movieId = r.movieId
     WHERE 1=1
     """
 
     # Ajouter les filtres en fonction des entrées de l'utilisateur
     if search_query:
-        base_query += f" AND LOWER(title) LIKE LOWER('%{search_query}%')"
+        base_query += f" AND LOWER(m.title) LIKE LOWER('%{search_query}%')"
 
     if selected_genre != "---":
-        base_query += f" AND LOWER(genres) LIKE LOWER('%{selected_genre}%')"
+        base_query += f" AND LOWER(m.genres) LIKE LOWER('%{selected_genre}%')"
 
     base_query += f"""
-    GROUP BY title
-    HAVING AVG(rating) >= {average_rating}
-    AND release_year >= {release_year}
+    AND r.avg_rating >= {average_rating}
+    AND m.release_year >= {release_year}
     """
 
     # Exécuter la requête de filtrage
