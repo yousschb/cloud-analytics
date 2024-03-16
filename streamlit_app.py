@@ -37,16 +37,14 @@ def build_query():
         filters.append(f"LOWER(m.title) LIKE LOWER('%{search_query}%')")
     if selected_genre != "---":
         filters.append(f"LOWER(m.genres) LIKE LOWER('%{selected_genre}%')")
-    filters.append(f"AVG(r.rating) >= {average_rating}")
     filters.append(f"m.release_year >= {release_year}")
     
     if filters:
         base_query += " AND " + " AND ".join(filters)
     
-    base_query += " GROUP BY m.title"  # Regrouper par titre pour obtenir la moyenne des notes
+    base_query += " GROUP BY m.title"  # Groupement par titre pour calculer la moyenne par film
     
     return base_query
-
 # Exécuter la requête de filtrage et afficher les résultats
 def update_results():
     query = build_query()
