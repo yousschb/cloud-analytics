@@ -1,5 +1,3 @@
-from google.cloud import bigquery
-
 # Spécifiez le chemin vers votre fichier de clé d'API Google Cloud
 key_path = "/Users/mac/Desktop/caa-assignement-1-417215-e1c1db571b4e.json"
 
