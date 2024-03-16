@@ -1,6 +1,6 @@
 import requests
 
-def get_movie_details(tmdb_id, language="en-US", api_key="VOTRE_CLE_API_TMDB"):
+def get_movie_details(tmdb_id, language="en-US", api_key="eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJjMWNmMjQ2MDE5MDkyZTY0ZDI1YWU1ZTNmMjVhMzkzMyIsInN1YiI6IjY1ZjU5ZTRlMDZmOTg0MDE3Y2M3Yzg3MCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.zF_TJxsIBuU9yHRlEQWEYYF7ZZg9ZoibgSnndHDhabA"):
     url = f"https://api.themoviedb.org/3/movie/{tmdb_id}"
     headers = {
         "accept": "application/json",
