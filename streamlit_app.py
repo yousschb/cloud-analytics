@@ -47,20 +47,6 @@ def build_query():
     
     return base_query
 
-
-# Exécuter la requête de filtrage et afficher les résultats
-def update_results():
-    query = build_query()
-    if query.strip() == "":
-        return "Please provide search criteria."
-    else:
-        query_job = client.query(query)
-        results = query_job.result()
-        if results.total_rows == 0:
-            return "No movies found matching the criteria."
-        else:
-            return results
-
 # Importation de la bibliothèque d'icônes
 from streamlit.components.v1 import html
 
@@ -85,8 +71,22 @@ def generate_stars(avg_rating):
     
     return stars_html
 
+# Exécuter la requête de filtrage et afficher les résultats
+def update_results():
+    query = build_query()
+    if query.strip() == "":
+        return "Please provide search criteria."
+    else:
+        query_job = client.query(query)
+        results = query_job.result()
+        if results.total_rows == 0:
+            return "No movies found matching the criteria."
+        else:
+            return results
+
 # Affichage des résultats
 st.write("### Results:")
+results = update_results()  # Appel de la fonction pour obtenir les résultats
 for movie_title, avg_rating in results:
     st.write(f"- {movie_title} - Average Rating: ")
     st.write(html(generate_stars(avg_rating)), unsafe_allow_html=True)
