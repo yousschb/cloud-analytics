@@ -10,97 +10,51 @@ client = bigquery.Client.from_service_account_json(key_path)
 # Titre de l'application
 st.title("Movie Database Search")
 
-# Afficher le champ de recherche pour les titres de films
-search_query = st.text_input("Search for movie titles", "")
+# Organiser l'interface en deux colonnes
+left_column, right_column = st.columns(2)
 
-# Vérifier si la barre de recherche n'est pas vide
-if search_query:
-    # Requête SQL pour l'autocomplétion des titres de films
-    autocomplete_query = f"""
-    SELECT title
-    FROM `caa-assignement-1-417215.Movies.Infos`
-    WHERE LOWER(title) LIKE LOWER('%{search_query}%')
-    """
-
-    # Exécuter la requête d'autocomplétion
-    autocomplete_results = client.query(autocomplete_query).result()
-
-    # Afficher les résultats de l'autocomplétion
-    for row in autocomplete_results:
-        st.write(row)
-
-# Liste déroulante pour sélectionner la langue
-language = st.selectbox("Select language", ["English", "French", "German", "Spanish", "Italian"])
-
-# Requête SQL pour filtrer par langue
-language_query = f"""
-SELECT title
-FROM `caa-assignement-1-417215.Movies.Infos`
-WHERE language = '{language}'
-"""
-
-# Exécuter la requête de filtrage par langue
-language_results = client.query(language_query).result()
-
-# Afficher les résultats du filtrage par langue
-for row in language_results:
-    st.write(row)
+# Zone de recherche de titre de film
+with left_column:
+    search_query = st.text_input("Search for movie titles", "")
 
 # Liste déroulante pour sélectionner le genre de film
-genre_choices = ["---", "Action", "Comedy", "Drama", "Horror", "Science Fiction"]
-selected_genre = st.selectbox("Select genre", genre_choices)
-
-# Vérifier si le genre sélectionné est différent de "---"
-if selected_genre != "---":
-    # Requête SQL pour filtrer par genre de film
-    genre_query = f"""
-    SELECT title
-    FROM `caa-assignement-1-417215.Movies.Infos`
-    WHERE LOWER(genres) LIKE LOWER('%{selected_genre}%')
-    """
-
-    # Exécuter la requête de filtrage par genre de film
-    genre_results = client.query(genre_query).result()
-
-    # Afficher les résultats du filtrage par genre de film
-    for row in genre_results:
-        st.write(row)
+with left_column:
+    genre_choices = ["---", "Action", "Comedy", "Drama", "Horror", "Science Fiction"]
+    selected_genre = st.selectbox("Select genre", genre_choices)
 
 # Curseur pour sélectionner la note moyenne
-average_rating = st.slider("Select minimum average rating", min_value=0.0, max_value=5.0, step=0.1, value=4.0)
-
-# Requête SQL pour filtrer par note moyenne
-rating_query = f"""
-SELECT m.title
-FROM `caa-assignement-1-417215.Movies.Infos` AS m
-JOIN (
-    SELECT movieId, AVG(rating) AS avg_rating
-    FROM `caa-assignement-1-417215.Ratings.Ratings`
-    GROUP BY movieId
-) AS r ON m.movieId = r.movieId
-WHERE r.avg_rating >= {average_rating}
-"""
-
-# Exécuter la requête de filtrage par note moyenne
-rating_results = client.query(rating_query).result()
-
-# Afficher les résultats du filtrage par note moyenne
-for row in rating_results:
-    st.write(row)
+with left_column:
+    average_rating = st.slider("Select minimum average rating", min_value=0.0, max_value=5.0, step=0.1, value=4.0)
 
 # Curseur pour sélectionner l'année de sortie minimale
-release_year = st.slider("Select minimum release year", min_value=1900, max_value=2022, value=2019)
+with left_column:
+    release_year = st.slider("Select minimum release year", min_value=1900, max_value=2022, value=2019)
 
-# Requête SQL pour filtrer par année de sortie
-year_query = f"""
-SELECT title
-FROM `caa-assignement-1-417215.Movies.Infos`
-WHERE release_year >= {release_year}
-"""
+# Afficher les résultats dans la colonne de droite
+with right_column:
+    # Construction de la requête SQL de base
+    base_query = """
+    SELECT title
+    FROM `caa-assignement-1-417215.Movies.Infos`
+    WHERE 1=1
+    """
 
-# Exécuter la requête de filtrage par année de sortie
-year_results = client.query(year_query).result()
+    # Ajouter les filtres en fonction des entrées de l'utilisateur
+    if search_query:
+        base_query += f" AND LOWER(title) LIKE LOWER('%{search_query}%')"
 
-# Afficher les résultats du filtrage par année de sortie
-for row in year_results:
-    st.write(row)
+    if selected_genre != "---":
+        base_query += f" AND LOWER(genres) LIKE LOWER('%{selected_genre}%')"
+
+    base_query += f"""
+    GROUP BY title
+    HAVING AVG(rating) >= {average_rating}
+    AND release_year >= {release_year}
+    """
+
+    # Exécuter la requête de filtrage
+    query_results = client.query(base_query).result()
+
+    # Afficher les résultats
+    for row in query_results:
+        st.write(row)
