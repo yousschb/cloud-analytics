@@ -29,13 +29,10 @@ def get_movie_details(tmdb_id):
 
 def main():
     tmdb_id = st.text_input("Enter the tmdbId of the movie:")
-    if tmdb_id:
+    if st.button("Get Movie Details") and tmdb_id:  # Ajoutez un bouton pour déclencher la recherche
         movie_details = get_movie_details(tmdb_id)
         if movie_details:
             st.write("### Movie Details:")
             st.write(movie_details)
         else:
             st.write("No movie details found for the provided tmdbId.")
-
-if __name__ == "__main__":
-    main()
