@@ -87,7 +87,8 @@ if st.button("Search"):
             movie_title = row[0]
             avg_rating = row[1]
             movie_id = row[2]
-            if st.button(movie_title):
+            button_clicked = st.button(movie_title)
+            if button_clicked:
                 # Afficher les détails du film sélectionné dans un panneau déroulant
                 with st.expander(f"Details of {movie_title}"):
                     movie_details = get_movie_details(movie_id)
