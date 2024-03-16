@@ -29,33 +29,17 @@ if search_query:
     for row in autocomplete_results:
         st.write(row)
 
-# Liste déroulante pour sélectionner la langue
-language = st.selectbox("Select language", ["English", "French", "German", "Spanish", "Italian"])
-
-# Requête SQL pour filtrer par langue
-language_query = f"""
-SELECT title
-FROM `caa-assignement-1-417215.Movies.Infos`
-WHERE language = '{language}'
-"""
-
-# Exécuter la requête de filtrage par langue
-language_results = client.query(language_query).result()
-
-# Afficher les résultats du filtrage par langue
-for row in language_results:
-    st.write(row)
-
 # Liste déroulante pour sélectionner le genre de film
-genre = st.selectbox("Select genre", ["Action", "Comedy", "Drama", "Horror", "Science Fiction"])
+genre_choices = ["---", "Action", "Comedy", "Drama", "Horror", "Science Fiction"]
+selected_genre = st.selectbox("Select genre", genre_choices)
 
-# Vérifier si un genre est sélectionné
-if genre:
+# Vérifier si le genre sélectionné est différent de "---"
+if selected_genre != "---":
     # Requête SQL pour filtrer par genre de film
     genre_query = f"""
     SELECT title
     FROM `caa-assignement-1-417215.Movies.Infos`
-    WHERE LOWER(genres) LIKE LOWER('%{genre}%')
+    WHERE LOWER(genres) LIKE LOWER('%{selected_genre}%')
     """
 
     # Exécuter la requête de filtrage par genre de film
