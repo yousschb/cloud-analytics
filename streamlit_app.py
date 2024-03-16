@@ -1,6 +1,5 @@
 from google.cloud import bigquery
 import streamlit as st
-from streamlit.components.v1 import html
 
 # Spécifiez le chemin vers votre fichier de clé d'API Google Cloud
 key_path = "caa-assignement-1-417215-e1c1db571b4e.json"
@@ -47,29 +46,6 @@ def build_query():
     
     return base_query
 
-# Importation de la bibliothèque d'icônes
-from streamlit.components.v1 import html
-
-# Fonction pour générer des étoiles en fonction de la note
-def generate_stars(avg_rating):
-    if avg_rating is None:  # Vérification si la note est nulle
-        return "No rating available"
-    
-    filled_stars = int(avg_rating)
-    remainder = avg_rating - filled_stars
-    
-    # Génération des étoiles pleines
-    stars_html = "★ " * filled_stars
-    
-    # Ajout de l'étoile à moitié si nécessaire
-    if remainder >= 0.25:
-        stars_html += "<i class='fas fa-star-half-alt'></i> "
-    
-    # Calcul des étoiles vides restantes
-    empty_stars = 5 - filled_stars - (1 if remainder >= 0.75 else 0)
-    stars_html += "☆ " * empty_stars
-    
-    return stars_html
 
 # Exécuter la requête de filtrage et afficher les résultats
 def update_results():
@@ -84,11 +60,34 @@ def update_results():
         else:
             return results
 
-# Affichage des résultats
-st.write("### Results:")
-results = update_results()  # Appel de la fonction pour obtenir les résultats
-for movie_title, avg_rating in results:
-    st.write(f"- {movie_title} - Average Rating: ")
-    stars_html = generate_stars(avg_rating)
-    st.markdown(stars_html, unsafe_allow_html=True)
+# Fonction pour générer des étoiles en fonction de la note
+def generate_stars(avg_rating):
+    if avg_rating is None:  # Vérification si la note est nulle
+        return "No rating available"
+    
+    filled_stars = int(avg_rating)
+    half_star = avg_rating - filled_stars >= 0.5
+    empty_stars = 5 - filled_stars - (1 if half_star else 0)
+    
+    stars_html = ""
+    for _ in range(filled_stars):
+        stars_html += "★ "
+    if half_star:
+        stars_html += "☆ "
+    for _ in range(empty_stars):
+        stars_html += "☆ "
+    
+    return stars_html
+
+# Bouton pour mettre à jour les résultats
+if st.button("Search"):
+    results = update_results()
+    if isinstance(results, str):
+        st.write(results)
+    else:
+        st.write("### Results:")
+        for row in results:
+            movie_title = row[0]
+            avg_rating = row[1]
+            st.write(f"- {movie_title} - Average Rating: {generate_stars(avg_rating)}")
 
