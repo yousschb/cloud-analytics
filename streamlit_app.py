@@ -102,18 +102,38 @@ def get_movie_details(title):
             movie_id = data['results'][0]['id']
             movie_details_url = f"https://api.themoviedb.org/3/movie/{movie_id}"
             params = {
-                "api_key": TMDB_API_KEY
+                "api_key": TMDB_API_KEY,
+                "append_to_response": "credits"
             }
             movie_response = requests.get(movie_details_url, params=params)
             if movie_response.status_code == 200:
                 movie_data = movie_response.json()
-                return movie_data
+                return format_movie_details(movie_data)
             else:
                 return "Failed to fetch movie details"
         else:
             return "Movie not found"
     else:
         return "Failed to fetch movie details"
+
+def format_movie_details(movie_data):
+    title = movie_data.get("title", "Unknown")
+    overview = movie_data.get("overview", "No overview available")
+    poster_path = movie_data.get("poster_path")
+    cast = [cast_member["name"] for cast_member in movie_data.get("credits", {}).get("cast", [])[:5]]
+    genres = [genre["name"] for genre in movie_data.get("genres", [])]
+
+    details = f"**Title:** {title}\n"
+    details += f"**Overview:** {overview}\n"
+    details += f"**Genres:** {', '.join(genres)}\n"
+    details += f"**Cast:** {', '.join(cast)}\n"
+
+    if poster_path:
+        poster_url = f"https://image.tmdb.org/t/p/w500{poster_path}"
+        details += f"![Poster]({poster_url})\n"
+
+    return details
+
 
 
 
