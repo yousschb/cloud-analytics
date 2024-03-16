@@ -63,26 +63,61 @@ def update_results():
         else:
             return results
 
+from google.cloud import bigquery
+import streamlit as st
+import requests
+
+# Spécifiez le chemin vers votre fichier de clé d'API Google Cloud
+key_path = "caa-assignement-1-417215-e1c1db571b4e.json"
+
+# Créez un client BigQuery en utilisant le fichier de clé d'API
+client = bigquery.Client.from_service_account_json(key_path)
+
+# Titre de l'application
+st.title("Movie Database Search")
+
+# Clé API TMDb
+TMDB_API_KEY = "c1cf246019092e64d25ae5e3f25a3933"
+
 # Fonction pour obtenir les détails du film à partir de l'API TMDb
-# Fonction pour obtenir les films populaires du jour à partir de l'API TMDb
-def get_trending_movies():
-    base_url = "https://api.themoviedb.org/3/trending/all/day"
+def get_movie_details(title):
+    base_url = "https://api.themoviedb.org/3/search/movie"
     params = {
-        "api_key": TMDB_API_KEY
+        "api_key": TMDB_API_KEY,
+        "query": title
     }
     response = requests.get(base_url, params=params)
     if response.status_code == 200:
         data = response.json()
-        return data['results']
+        if data['total_results'] > 0:
+            movie_id = data['results'][0]['id']
+            movie_details_url = f"https://api.themoviedb.org/3/movie/{movie_id}"
+            params = {
+                "api_key": TMDB_API_KEY
+            }
+            movie_response = requests.get(movie_details_url, params=params)
+            if movie_response.status_code == 200:
+                movie_data = movie_response.json()
+                return movie_data
+            else:
+                return "Failed to fetch movie details"
+        else:
+            return "Movie not found"
     else:
-        return "Failed to fetch trending movies"
+        return "Failed to fetch movie details"
 
-# Afficher les résultats des films populaires du jour
-trending_movies = get_trending_movies()
-if isinstance(trending_movies, str):
-    st.write(trending_movies)
-else:
-    st.write("### Trending Movies Today:")
-    for movie in trending_movies:
-        st.write(f"- {movie['title']} ({movie['release_date']})")
-
+# Afficher les résultats de la recherche
+if st.button("Search"):
+    results = update_results()
+    if isinstance(results, str):
+        st.write(results)
+    else:
+        st.write("### Results:")
+        for row in results:
+            movie_title = row[0]
+            avg_rating = row[1]
+            if st.button(movie_title):
+                # Afficher les détails du film sélectionné dans un panneau déroulant
+                with st.expander(f"Details of {movie_title}"):
+                    movie_details = get_movie_details(movie_title)
+                    st.write(movie_details)
