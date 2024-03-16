@@ -50,8 +50,47 @@ def build_query():
     return base_query
 
 
-# Importation de la bibliothèque d'icônes
-from streamlit.components.v1 import html
+from google.cloud import bigquery
+import streamlit as st
+
+# Spécifiez le chemin vers votre fichier de clé d'API Google Cloud
+key_path = "caa-assignement-1-417215-e1c1db571b4e.json"
+
+# Créez un client BigQuery en utilisant le fichier de clé d'API
+client = bigquery.Client.from_service_account_json(key_path)
+
+# Titre de l'application
+st.title("Movie Database Search")
+
+# Zone de recherche de titre de film
+search_query = st.text_input("Search for movie titles", "")
+
+# Liste déroulante pour sélectionner le genre de film
+genre_choices = ["---", "Action", "Comedy", "Drama", "Horror", "Science Fiction"]
+selected_genre = st.selectbox("Select genre", genre_choices)
+
+# Curseur pour sélectionner la note moyenne
+average_rating = st.slider("Select minimum average rating", min_value=0.0, max_value=5.0, step=0.1, value=3.0)
+
+# Curseur pour sélectionner l'année de sortie minimale
+release_year = st.slider("Select minimum release year", min_value=1900, max_value=2022, value=1980)
+
+# Construction de la requête SQL de base
+def build_query():
+    query = """
+    SELECT m.title, AVG(r.rating) AS avg_rating
+    FROM `caa-assignement-1-417215.Movies.Infos` AS m
+    JOIN `caa-assignement-1-417215.Movies.ratings` AS r ON m.movieId = r.movieId
+    WHERE 1=1
+    """
+    
+    if search_query:
+        query += f" AND LOWER(m.title) LIKE LOWER('%{search_query}%')"
+    if selected_genre != "---":
+        query += f" AND LOWER(m.genres) LIKE LOWER('%{selected_genre}%')"
+    query += f" AND r.rating IS NOT NULL AND r.rating >= {average_rating} AND m.release_year >= {release_year}"
+    query += " GROUP BY m.title"
+    return query
 
 # Exécuter la requête de filtrage et afficher les résultats
 def update_results():
@@ -64,7 +103,7 @@ def update_results():
         if results.total_rows == 0:
             return "No movies found matching the criteria."
         else:
-            formatted_results = [(row[0], row.get(1)) for row in results]  # Utilisation de row.get() pour éviter l'erreur
+            formatted_results = [(row["title"], row.get("avg_rating")) for row in results]
             return formatted_results
 
 # Fonction pour générer des étoiles en fonction de la note
