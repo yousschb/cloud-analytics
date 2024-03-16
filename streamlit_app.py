@@ -11,6 +11,15 @@ TMDB_API_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJjMWNmMjQ2MDE5MDkyZTY0ZDI1YWU1ZTN
 # Créez un client BigQuery en utilisant le fichier de clé d'API
 client = bigquery.Client.from_service_account_json(key_path)
 
+# Titre de l'application
+st.title("Movie Database Search")
+
+# Zone de recherche de titre de film
+search_query = st.text_input("Search for movie titles", "")
+
+# Bouton de recherche
+search_button = st.button("Search")
+
 # Fonction pour récupérer les détails d'un film à partir de son tmdbId et de la langue
 def get_movie_details(tmdb_id, language="en-US"):
     url = f"https://api.themoviedb.org/3/movie/{tmdb_id}"
@@ -20,45 +29,6 @@ def get_movie_details(tmdb_id, language="en-US"):
         return response.json()
     else:
         return None
-
-# Titre de l'application
-st.title("Movie Database Search")
-
-# Zone de recherche de titre de film
-search_query = st.text_input("Search for movie titles", "")
-
-# Liste déroulante pour sélectionner le genre de film
-genre_choices = ["---", "Action", "Comedy", "Drama", "Horror", "Science Fiction"]
-selected_genre = st.selectbox("Select genre", genre_choices)
-
-# Curseur pour sélectionner la note moyenne
-average_rating = st.slider("Select minimum average rating", min_value=0.0, max_value=5.0, step=0.1, value=3.0)
-
-# Curseur pour sélectionner l'année de sortie minimale
-release_year = st.slider("Select minimum release year", min_value=1900, max_value=2022, value=1980)
-
-# Construction de la requête SQL de base
-def build_query():
-    base_query = """
-    SELECT m.title, m.tmdbId, m.language, AVG(r.rating) as avg_rating
-    FROM `caa-assignement-1-417215.Movies.Infos` AS m
-    JOIN `caa-assignement-1-417215.Movies.ratings` AS r ON m.movieId = r.movieId
-    WHERE 1=1
-    """
-    # Ajouter les filtres en fonction des entrées de l'utilisateur
-    filters = []
-    if search_query:
-        filters.append(f"LOWER(m.title) LIKE LOWER('%{search_query}%')")
-    if selected_genre != "---":
-        filters.append(f"LOWER(m.genres) LIKE LOWER('%{selected_genre}%')")
-    filters.append(f"m.release_year >= {release_year}")
-    
-    if filters:
-        base_query += " AND " + " AND ".join(filters)
-    
-    base_query += f" GROUP BY m.title, m.tmdbId, m.language HAVING AVG(r.rating) >= {average_rating}"  # Utilisation de f-string pour insérer la variable
-    
-    return base_query
 
 # Fonction pour afficher les détails d'un film
 def display_movie_details(movie):
@@ -74,14 +44,16 @@ def display_movie_details(movie):
 
 # Exécuter la requête de filtrage et afficher les résultats avec les détails des films
 def update_results():
-    query = build_query()
-    if query.strip() == "":
-        return "Please provide search criteria."
-    else:
+    if search_query:
+        query = f"""
+            SELECT m.tmdbId, m.language
+            FROM `caa-assignement-1-417215.Movies.Infos` AS m
+            WHERE LOWER(m.title) LIKE LOWER('%{search_query}%')
+        """
         query_job = client.query(query)
         results = query_job.result()
         if results.total_rows == 0:
-            return "No movies found matching the criteria."
+            st.write("No movies found matching the search criteria.")
         else:
             for row in results:
                 tmdb_id = row["tmdbId"]
@@ -90,4 +62,5 @@ def update_results():
                 display_movie_details(movie_details)
 
 # Appel à la fonction update_results pour afficher les résultats dans l'interface utilisateur
-update_results()
+if search_button:
+    update_results()
