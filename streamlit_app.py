@@ -89,4 +89,6 @@ st.write("### Results:")
 results = update_results()  # Appel de la fonction pour obtenir les résultats
 for movie_title, avg_rating in results:
     st.write(f"- {movie_title} - Average Rating: ")
-    st.write(html(generate_stars(avg_rating)), unsafe_allow_html=True)
+    stars_html = generate_stars(avg_rating)
+    st.markdown(stars_html, unsafe_allow_html=True)
+
