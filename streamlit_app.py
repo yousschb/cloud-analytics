@@ -36,7 +36,6 @@ def main():
                 col1.image(f"https://image.tmdb.org/t/p/w500/{movie_details['poster_path']}", caption="Movie Poster", use_column_width=True)
 
             # Afficher les informations du film dans la deuxième colonne
-            col2.write("### Movie Details:")
             col2.write(f"Title: {movie_details['title']}")
             col2.write(f"Overview: {movie_details['overview']}")
             col2.write(f"Release Date: {movie_details['release_date']}")
