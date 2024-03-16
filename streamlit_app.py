@@ -63,7 +63,7 @@ def update_results():
             return results
 
 # Bouton pour mettre à jour les résultats
-if st.button("Results"):
+if st.button("Search"):
     results = update_results()
     if isinstance(results, str):
         st.write(results)
