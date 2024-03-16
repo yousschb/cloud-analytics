@@ -29,37 +29,17 @@ def main():
     
     # Recherche de tous les résultats de nom de film contenant les mots clés
     query = f"""
-        SELECT title
+        SELECT title, tmdbId
         FROM `caa-assignement-1-417215.Movies.Infos`
         WHERE LOWER(title) LIKE LOWER('%{movie_name}%')
     """
     query_job = client.query(query)
     results = query_job.result()
 
-    # Afficher les résultats à la suite les uns des autres
+    # Afficher la liste des résultats
     for row in results:
         if st.button(row.title):
-            selected_movie = row.title
-            break
-    else:
-        selected_movie = None
-
-    if st.button("Get Movie Details") and selected_movie:
-        # Recherche du tmdb_id correspondant au nom du film sélectionné
-        query = f"""
-            SELECT tmdbId
-            FROM `caa-assignement-1-417215.Movies.Infos`
-            WHERE LOWER(title) = LOWER('{selected_movie}')
-            LIMIT 1
-        """
-        query_job = client.query(query)
-        results = query_job.result()
-        for row in results:
-            tmdb_id = row.tmdbId
-            break
-
-        if tmdb_id:
-            movie_details = get_movie_details(tmdb_id)
+            movie_details = get_movie_details(row.tmdbId)
             if movie_details:
                 col1, col2 = st.columns([1, 2])  # Diviser la page en 2 colonnes
 
@@ -75,8 +55,7 @@ def main():
                 col2.write(f"Average Vote: {movie_details['vote_average']}")
             else:
                 st.write("No movie details found for the provided tmdbId.")
-        else:
-            st.write("No movie found with the provided name.")
+            break
 
 if __name__ == "__main__":
     main()
