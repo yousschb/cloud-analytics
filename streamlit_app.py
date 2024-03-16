@@ -33,11 +33,8 @@ def main():
             st.write(f"Title: {movie_details['title']}")
             st.write(f"Overview: {movie_details['overview']}")
             st.write(f"Release Date: {movie_details['release_date']}")
-            st.write(f"Budget: ${movie_details['budget']}")
             st.write(f"Genres: {', '.join(genre['name'] for genre in movie_details['genres'])}")
-            st.write(f"Popularity: {movie_details['popularity']}")
             st.write(f"Average Vote: {movie_details['vote_average']}")
-            st.write(f"Vote Count: {movie_details['vote_count']}")
         else:
             st.write("No movie details found for the provided tmdbId.")
 
