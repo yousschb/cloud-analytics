@@ -1,7 +1,7 @@
 from google.cloud import bigquery
 
 # Spécifiez le chemin vers votre fichier de clé d'API Google Cloud
-key_path = "/Users/mac/Desktop/assignment1-data/caa-assignement-1-417215-e1c1db571b4e.json"
+key_path = "caa-assignement-1-417215-e1c1db571b4e.json"
 
 # Créez un client BigQuery en utilisant le fichier de clé d'API
 client = bigquery.Client.from_service_account_json(key_path)
