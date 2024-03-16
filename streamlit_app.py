@@ -71,3 +71,4 @@ def update_results():
 if search_button:
     update_results()
 
+
