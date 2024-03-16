@@ -68,20 +68,18 @@ def generate_stars(avg_rating):
     filled_stars = int(avg_rating)
     remainder = avg_rating - filled_stars
     half_star = remainder >= 0.5
-    quarter_fill = min(int(remainder * 4), 3) if half_star else 0
-    empty_stars = 5 - filled_stars - (1 if half_star else 0) - quarter_fill
     
     stars_html = ""
     for _ in range(filled_stars):
         stars_html += "★ "
     if half_star:
         stars_html += "☆ "
-    for _ in range(quarter_fill):
-        stars_html += "★¼"
+    empty_stars = 4 - filled_stars - (1 if half_star else 0)
     for _ in range(empty_stars):
         stars_html += "☆ "
     
     return stars_html
+
 
 
 # Bouton pour mettre à jour les résultats
