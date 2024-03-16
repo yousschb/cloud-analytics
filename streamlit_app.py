@@ -27,11 +27,6 @@ def get_movie_details(tmdb_id):
     print(response.text)
 
 
-
-response = requests.get(url, headers=headers)
-
-print(response.text)
-
 def main():
     tmdb_id = st.text_input("Enter the tmdbId of the movie:")
     if tmdb_id:
