@@ -42,9 +42,10 @@ def build_query():
     if filters:
         base_query += " AND " + " AND ".join(filters)
     
-    base_query += " GROUP BY m.title"  # Groupement par titre pour calculer la moyenne par film
+    base_query += " GROUP BY m.title HAVING AVG(r.rating) >= {average_rating}"  # Ajout de la condition HAVING
     
     return base_query
+
 # Exécuter la requête de filtrage et afficher les résultats
 def update_results():
     query = build_query()
