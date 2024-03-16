@@ -69,22 +69,16 @@ def generate_stars(avg_rating):
         return "No rating available"
     
     filled_stars = int(avg_rating)
-    remainder = avg_rating - filled_stars
+    half_star = avg_rating - filled_stars >= 0.5
+    empty_stars = 5 - filled_stars - (1 if half_star else 0)
     
-    # Génération des étoiles pleines
-    stars_html = "★" * filled_stars
-    
-    # Ajout de l'étoile à moitié si nécessaire
-    if remainder >= 0.25:
-        stars_html += "¼"
-    if remainder >= 0.5:
-        stars_html += "★"
-    if remainder >= 0.75:
-        stars_html += "¾"
-    
-    # Calcul des étoiles vides restantes
-    empty_stars = 5 - filled_stars
-    stars_html += "☆" * empty_stars
+    stars_html = ""
+    for _ in range(filled_stars):
+        stars_html += "★ "
+    if half_star:
+        stars_html += "☆ "
+    for _ in range(empty_stars):
+        stars_html += "☆ "
     
     return stars_html
 
