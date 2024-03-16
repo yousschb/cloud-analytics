@@ -8,8 +8,18 @@ key_path = "caa-assignement-1-417215-e1c1db571b4e.json"
 # Clé API TMDb
 TMDB_API_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJjMWNmMjQ2MDE5MDkyZTY0ZDI1YWU1ZTNmMjVhMzkzMyIsInN1YiI6IjY1ZjU5ZTRlMDZmOTg0MDE3Y2M3Yzg3MCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.zF_TJxsIBuU9yHRlEQWEYYF7ZZg9ZoibgSnndHDhabA"
 
-# Créez un client BigQuery en utilisant le fichier de clé d'API Google Cloud
+# Créez un client BigQuery en utilisant le fichier de clé d'API
 client = bigquery.Client.from_service_account_json(key_path)
+
+# Fonction pour récupérer les détails d'un film à partir de son tmdbId et de la langue
+def get_movie_details(tmdb_id, language="en-US"):
+    url = f"https://api.themoviedb.org/3/movie/{tmdb_id}"
+    params = {"language": language, "api_key": TMDB_API_KEY}
+    response = requests.get(url, params=params)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return None
 
 # Titre de l'application
 st.title("Movie Database Search")
@@ -50,7 +60,19 @@ def build_query():
     
     return base_query
 
-# Exécuter la requête de filtrage et afficher les résultats
+# Fonction pour afficher les détails d'un film
+def display_movie_details(movie):
+    if movie:
+        st.subheader(movie["title"])
+        st.image(f"https://image.tmdb.org/t/p/w500/{movie['poster_path']}")
+        st.write("Overview:", movie["overview"])
+        st.write("Release Date:", movie["release_date"])
+        st.write("Genres:", ", ".join([genre["name"] for genre in movie["genres"]]))
+        st.write("Cast:", ", ".join([cast["name"] for cast in movie["credits"]["cast"]]))
+    else:
+        st.write("No movie details found.")
+
+# Exécuter la requête de filtrage et afficher les résultats avec les détails des films
 def update_results():
     query = build_query()
     if query.strip() == "":
@@ -61,34 +83,11 @@ def update_results():
         if results.total_rows == 0:
             return "No movies found matching the criteria."
         else:
-            return results
+            for row in results:
+                tmdb_id = row["tmdbId"]
+                language = row["language"]
+                movie_details = get_movie_details(tmdb_id, language)
+                display_movie_details(movie_details)
 
-# Fonction pour obtenir les détails du film à partir de l'API TMDb
-def get_movie_details(movie_id):
-    url = f"https://api.themoviedb.org/3/movie/{movie_id}?language=en-US"
-    headers = {
-        "accept": "application/json",
-        "Authorization": f"Bearer {TMDB_API_KEY}"
-    }
-    response = requests.get(url, headers=headers)
-    if response.status_code == 200:
-        return response.json()
-    else:
-        return "Failed to fetch movie details"
-
-# Afficher les résultats de la recherche
-if st.button("Search"):
-    results = update_results()
-    if isinstance(results, str):
-        st.write(results)
-    else:
-        st.write("### Results:")
-        for row in results:
-            movie_title = row[0]
-            tmdb_id = row[1]
-            movie_language = row[2]
-            if st.button(movie_title):
-                # Afficher les détails du film sélectionné dans un panneau déroulant
-                with st.expander(f"Details of {movie_title}"):
-                    movie_details = get_movie_details(tmdb_id)
-                    st.write(movie_details)
+# Appel à la fonction update_results pour afficher les résultats dans l'interface utilisateur
+update_results()
