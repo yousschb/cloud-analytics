@@ -20,45 +20,42 @@ average_rating = st.slider("Select minimum average rating", min_value=0.0, max_v
 # Curseur pour sélectionner l'année de sortie minimale
 release_year = st.slider("Select minimum release year", min_value=1900, max_value=2022, value=1980)
 
-# Vérifier si au moins un critère de recherche est spécifié
-if search_query or selected_genre != "---":
-    # Construction de la requête SQL de base
-    base_query = """
-    SELECT m.title
-    FROM `caa-assignement-1-417215.Movies.Infos` AS m
-    JOIN (
-        SELECT movieId, AVG(rating) AS avg_rating
-        FROM `caa-assignement-1-417215.Movies.ratings`
-        GROUP BY movieId
-    ) AS r ON m.movieId = r.movieId
-    WHERE 1=1
-    """
+# Construction de la requête SQL de base
+base_query = """
+SELECT m.title
+FROM `caa-assignement-1-417215.Movies.Infos` AS m
+JOIN (
+    SELECT movieId, AVG(rating) AS avg_rating
+    FROM `caa-assignement-1-417215.Movies.ratings`
+    GROUP BY movieId
+) AS r ON m.movieId = r.movieId
+WHERE 1=1
+"""
 
-    # Ajouter les filtres en fonction des entrées de l'utilisateur
-    if search_query:
-        base_query += " AND LOWER(m.title) LIKE LOWER(@search_query)"
-    if selected_genre != "---":
-        base_query += " AND LOWER(m.genres) LIKE LOWER(@selected_genre)"
-    base_query += " AND r.avg_rating >= @average_rating AND m.release_year >= @release_year"
+# Ajouter les filtres en fonction des entrées de l'utilisateur
+if search_query:
+    base_query += " AND LOWER(m.title) LIKE LOWER(@search_query)"
+if selected_genre != "---":
+    base_query += " AND LOWER(m.genres) LIKE LOWER(@selected_genre)"
+base_query += " AND r.avg_rating >= @average_rating AND m.release_year >= @release_year"
 
-    # Préparer les paramètres de requête
-    query_params = {
-        "search_query": f"%{search_query}%",
-        "selected_genre": f"%{selected_genre}%",
-        "average_rating": average_rating,
-        "release_year": release_year
-    }
+# Créer un objet de requête
+query_job = client.query(base_query)
 
-    # Exécuter la requête de filtrage
-    query_job = client.query(base_query, query_params=query_params)
+# Attribuer des paramètres à la requête
+query_job.query_parameters = [
+    bigquery.ScalarQueryParameter("search_query", "STRING", f"%{search_query}%"),
+    bigquery.ScalarQueryParameter("selected_genre", "STRING", f"%{selected_genre}%"),
+    bigquery.ScalarQueryParameter("average_rating", "FLOAT64", average_rating),
+    bigquery.ScalarQueryParameter("release_year", "INT64", release_year)
+]
 
-    # Afficher les résultats
-    results = query_job.result()
-    if results.total_rows == 0:
-        st.write("No movies found matching the criteria.")
-    else:
-        movie_titles = [row.title for row in results]
-        st.write("Movies found:")
-        st.write(movie_titles)
+# Exécuter la requête de filtrage
+results = query_job.result()
+
+# Afficher les résultats
+if results.total_rows == 0:
+    st.write("No movies found matching the criteria.")
 else:
-    st.write("Please specify at least one search criteria.")
+    for row in results:
+        st.write(row)
