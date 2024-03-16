@@ -26,8 +26,9 @@ def get_movie_details(tmdb_id):
 
 def main():
     movie_name = st.text_input("Enter keywords of the movie name:")
-    
-    if movie_name:  # Vérifie si l'utilisateur a entré des mots-clés avant de lancer la recherche
+    search_button = st.button("Search")  # Ajouter un bouton de recherche
+
+    if search_button or movie_name:  # Vérifie si l'utilisateur a entré des mots-clés ou a appuyé sur le bouton de recherche
         # Recherche de tous les résultats de nom de film contenant les mots clés
         query = f"""
             SELECT title
