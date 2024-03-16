@@ -43,21 +43,19 @@ if selected_genre != "---":
     base_query += " AND LOWER(m.genres) LIKE LOWER(@selected_genre)"
 base_query += " AND r.avg_rating >= @average_rating AND m.release_year >= @release_year"
 
-# Créer un objet de requête
-query_job = client.query(base_query)
-
-# Attribuer des paramètres à la requête
-query_job.query_parameters = [
+# Préparer les paramètres de requête
+query_params = [
     bigquery.ScalarQueryParameter("search_query", "STRING", f"%{search_query}%"),
     bigquery.ScalarQueryParameter("selected_genre", "STRING", f"%{selected_genre}%"),
     bigquery.ScalarQueryParameter("average_rating", "FLOAT64", average_rating),
     bigquery.ScalarQueryParameter("release_year", "INT64", release_year)
 ]
 
-# Exécuter la requête de filtrage
-results = query_job.result()
+# Exécuter la requête de filtrage avec les paramètres
+query_job = client.query(base_query, job_config=bigquery.QueryJobConfig(query_parameters=query_params))
 
 # Afficher les résultats
+results = query_job.result()
 if results.total_rows == 0:
     st.write("No movies found matching the criteria.")
 else:
