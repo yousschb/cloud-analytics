@@ -25,13 +25,28 @@ def get_movie_details(tmdb_id):
         return None
 
 def main():
-    movie_name = st.text_input("Enter the name of the movie:")
-    if st.button("Get Movie Details") and movie_name:  # Ajoutez un bouton pour déclencher la recherche
-        # Recherche du tmdb_id correspondant au nom du film dans la table Movies.Infos
+    movie_name = st.text_input("Enter keywords of the movie name:")
+    
+    # Recherche de tous les résultats de nom de film contenant les mots clés
+    query = f"""
+        SELECT title
+        FROM `caa-assignement-1-417215.Movies.Infos`
+        WHERE LOWER(title) LIKE LOWER('%{movie_name}%')
+    """
+    query_job = client.query(query)
+    results = query_job.result()
+
+    movie_options = [row.title for row in results]
+
+    # Afficher la liste des résultats
+    selected_movie = st.selectbox("Select a movie:", movie_options)
+
+    if st.button("Get Movie Details") and selected_movie:  # Ajoutez un bouton pour déclencher la recherche
+        # Recherche du tmdb_id correspondant au nom du film sélectionné
         query = f"""
             SELECT tmdbId
             FROM `caa-assignement-1-417215.Movies.Infos`
-            WHERE LOWER(title) LIKE LOWER('%{movie_name}%')
+            WHERE LOWER(title) = LOWER('{selected_movie}')
             LIMIT 1
         """
         query_job = client.query(query)
