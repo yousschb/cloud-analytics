@@ -50,8 +50,7 @@ def build_query():
     return base_query
 
 # Exécuter la requête de filtrage et afficher les résultats
-@st.experimental_callback()
-def update_results(search_query, selected_genre, average_rating, release_year):
+def update_results():
     query = build_query()
     if query.strip() == "":
         return "Please provide search criteria."
@@ -63,10 +62,12 @@ def update_results(search_query, selected_genre, average_rating, release_year):
         else:
             return results
 
-# Appel de la fonction pour exécuter la requête et afficher les résultats
-results = update_results(search_query, selected_genre, average_rating, release_year)
-if isinstance(results, str):
-    st.write(results)
-else:
-    for row in results:
-        st.write(row)
+# Bouton pour mettre à jour les résultats
+if st.button("Update Results"):
+    results = update_results()
+    if isinstance(results, str):
+        st.write(results)
+    else:
+        for row in results:
+            st.write(row)
+
