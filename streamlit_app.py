@@ -25,7 +25,7 @@ average_rating = st.slider("Select minimum average rating", min_value=0.0, max_v
 release_year = st.slider("Select minimum release year", min_value=1900, max_value=2022, value=1980)
 
 # Construction de la requête SQL de base
-def build_query():
+def build_query(search_query, selected_genre, average_rating, release_year):
     base_query = """
     SELECT m.title, AVG(r.rating) as avg_rating
     FROM `caa-assignement-1-417215.Movies.Infos` AS m
@@ -49,8 +49,8 @@ def build_query():
 
 
 # Exécuter la requête de filtrage et afficher les résultats
-def update_results():
-    query = build_query()
+def update_results(search_query, selected_genre, average_rating, release_year):
+    query = build_query(search_query, selected_genre, average_rating, release_year)
     if query.strip() == "":
         return "Please provide search criteria."
     else:
@@ -117,10 +117,9 @@ def get_movie_details(title):
 
 
 
-
 # Afficher les résultats de la recherche
 if st.button("Search"):
-    results = update_results()
+    results = update_results(search_query, selected_genre, average_rating, release_year)
     if isinstance(results, str):
         st.write(results)
     else:
