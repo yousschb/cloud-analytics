@@ -7,7 +7,6 @@ key_path = "caa-assignement-1-417215-e1c1db571b4e.json"
 # Créez un client BigQuery en utilisant le fichier de clé d'API
 client = bigquery.Client.from_service_account_json(key_path)
 
-
 # Titre de l'application
 st.title("Movie Database Search")
 
@@ -33,31 +32,35 @@ JOIN (
     FROM `caa-assignement-1-417215.Movies.ratings`
     GROUP BY movieId
 ) AS r ON m.movieId = r.movieId
-WHERE 1=1
 """
 
 # Ajouter les filtres en fonction des entrées de l'utilisateur
-if search_query:
-    base_query += " AND LOWER(m.title) LIKE LOWER(@search_query)"
-if selected_genre != "---":
-    base_query += " AND LOWER(m.genres) LIKE LOWER(@selected_genre)"
-base_query += " AND r.avg_rating >= @average_rating AND m.release_year >= @release_year"
+if search_query or selected_genre != "---" or average_rating != 3.0 or release_year != 1980:
+    base_query += " WHERE 1=1"  # Début de la clause WHERE uniquement si des critères sont spécifiés
+    
+    if search_query:
+        base_query += " AND LOWER(m.title) LIKE LOWER(@search_query)"
+    if selected_genre != "---":
+        base_query += " AND LOWER(m.genres) LIKE LOWER(@selected_genre)"
+    base_query += " AND r.avg_rating >= @average_rating AND m.release_year >= @release_year"
 
-# Préparer les paramètres de requête
-query_params = [
-    bigquery.ScalarQueryParameter("search_query", "STRING", f"%{search_query}%"),
-    bigquery.ScalarQueryParameter("selected_genre", "STRING", f"%{selected_genre}%"),
-    bigquery.ScalarQueryParameter("average_rating", "FLOAT64", average_rating),
-    bigquery.ScalarQueryParameter("release_year", "INT64", release_year)
-]
+    # Préparer les paramètres de requête
+    query_params = {
+        "search_query": f"%{search_query}%" if search_query else None,
+        "selected_genre": f"%{selected_genre}%" if selected_genre != "---" else None,
+        "average_rating": average_rating,
+        "release_year": release_year
+    }
 
-# Exécuter la requête de filtrage avec les paramètres
-query_job = client.query(base_query, job_config=bigquery.QueryJobConfig(query_parameters=query_params))
+    # Exécuter la requête de filtrage avec les paramètres
+    query_job = client.query(base_query, query_params=query_params)
 
-# Afficher les résultats
-results = query_job.result()
-if results.total_rows == 0:
-    st.write("No movies found matching the criteria.")
+    # Afficher les résultats
+    results = query_job.result()
+    if results.total_rows == 0:
+        st.write("No movies found matching the criteria.")
+    else:
+        for row in results:
+            st.write(row)
 else:
-    for row in results:
-        st.write(row)
+    st.write("Please provide search criteria.")
