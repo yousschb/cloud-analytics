@@ -1,23 +1,15 @@
+import requests
 from google.cloud import bigquery
 import streamlit as st
-from tmdbv3api import TMDb
-from tmdbv3api import Movie
-
-# Clé API TMDb
-TMDB_API_KEY = "c1cf246019092e64d25ae5e3f25a3933"
 
 # Spécifiez le chemin vers votre fichier de clé d'API Google Cloud
 key_path = "caa-assignement-1-417215-e1c1db571b4e.json"
 
+# Clé API TMDb
+TMDB_API_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJjMWNmMjQ2MDE5MDkyZTY0ZDI1YWU1ZTNmMjVhMzkzMyIsInN1YiI6IjY1ZjU5ZTRlMDZmOTg0MDE3Y2M3Yzg3MCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.zF_TJxsIBuU9yHRlEQWEYYF7ZZg9ZoibgSnndHDhabA"
+
 # Créez un client BigQuery en utilisant le fichier de clé d'API
 client = bigquery.Client.from_service_account_json(key_path)
-
-# Initialisez l'objet TMDb avec votre jeton d'accès en lecture
-tmdb = TMDb()
-tmdb.api_key = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJjMWNmMjQ2MDE5MDkyZTY0ZDI1YWU1ZTNmMjVhMzkzMyIsInN1YiI6IjY1ZjU5ZTRlMDZmOTg0MDE3Y2M3Yzg3MCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.zF_TJxsIBuU9yHRlEQWEYYF7ZZg9ZoibgSnndHDhabA'
-
-# Initialisez l'objet Movie pour effectuer des requêtes sur les films
-movie = Movie()
 
 # Titre de l'application
 st.title("Movie Database Search")
@@ -58,7 +50,6 @@ def build_query():
     
     return base_query
 
-
 # Exécuter la requête de filtrage et afficher les résultats
 def update_results():
     query = build_query()
@@ -72,29 +63,32 @@ def update_results():
         else:
             return results
 
-# Importation de la bibliothèque d'icônes
-from streamlit.components.v1 import html
-
-# Fonction pour générer des étoiles en fonction de la note
-def generate_stars(avg_rating):
-    if avg_rating is None:  # Vérification si la note est nulle
-        return "No rating available"
-    
-    filled_stars = int(avg_rating)
-    half_star = avg_rating - filled_stars >= 0.5
-    empty_stars = 5 - filled_stars - (1 if half_star else 0)
-    
-    stars_html = ""
-    for _ in range(filled_stars):
-        stars_html += "★ "
-    if half_star:
-        stars_html += "☆ "
-    for _ in range(empty_stars):
-        stars_html += "☆ "
-    
-    return stars_html
-
-
+# Fonction pour obtenir les détails du film à partir de l'API TMDb
+def get_movie_details(title):
+    base_url = "https://api.themoviedb.org/3/search/movie"
+    params = {
+        "api_key": TMDB_API_KEY,
+        "query": title
+    }
+    response = requests.get(base_url, params=params)
+    if response.status_code == 200:
+        data = response.json()
+        if data['total_results'] > 0:
+            movie_id = data['results'][0]['id']
+            movie_details_url = f"https://api.themoviedb.org/3/movie/{movie_id}"
+            params = {
+                "api_key": TMDB_API_KEY
+            }
+            movie_response = requests.get(movie_details_url, params=params)
+            if movie_response.status_code == 200:
+                movie_data = movie_response.json()
+                return movie_data
+            else:
+                return "Failed to fetch movie details"
+        else:
+            return "Movie not found"
+    else:
+        return "Failed to fetch movie details"
 
 # Afficher les résultats de la recherche
 if st.button("Search"):
@@ -109,7 +103,5 @@ if st.button("Search"):
             if st.button(movie_title):
                 # Afficher les détails du film sélectionné dans un panneau déroulant
                 with st.expander(f"Details of {movie_title}"):
-                    search_result = movie.search(movie_title)
-                    if search_result:
-                        movie_details = movie.details(search_result[0].id)
-                        st.write(movie_details)
+                    movie_details = get_movie_details(movie_title)
+                    st.write(movie_details)
