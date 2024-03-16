@@ -26,13 +26,9 @@ release_year = st.slider("Select minimum release year", min_value=1900, max_valu
 # Construction de la requête SQL de base
 def build_query():
     base_query = """
-    SELECT m.title
+    SELECT m.title, AVG(r.rating) as avg_rating
     FROM `caa-assignement-1-417215.Movies.Infos` AS m
-    JOIN (
-        SELECT movieId, AVG(rating) AS avg_rating
-        FROM `caa-assignement-1-417215.Movies.ratings`
-        GROUP BY movieId
-    ) AS r ON m.movieId = r.movieId
+    JOIN `caa-assignement-1-417215.Movies.ratings` AS r ON m.movieId = r.movieId
     WHERE 1=1
     """
     # Ajouter les filtres en fonction des entrées de l'utilisateur
@@ -41,11 +37,13 @@ def build_query():
         filters.append(f"LOWER(m.title) LIKE LOWER('%{search_query}%')")
     if selected_genre != "---":
         filters.append(f"LOWER(m.genres) LIKE LOWER('%{selected_genre}%')")
-    filters.append(f"r.avg_rating >= {average_rating}")
+    filters.append(f"AVG(r.rating) >= {average_rating}")
     filters.append(f"m.release_year >= {release_year}")
     
     if filters:
         base_query += " AND " + " AND ".join(filters)
+    
+    base_query += " GROUP BY m.title"  # Regrouper par titre pour obtenir la moyenne des notes
     
     return base_query
 
@@ -60,8 +58,26 @@ def update_results():
         if results.total_rows == 0:
             return "No movies found matching the criteria."
         else:
-            formatted_results = [row[0] for row in results]  # Extraire les valeurs des résultats
-            return formatted_results
+            return results
+
+# Fonction pour générer des étoiles en fonction de la note
+def generate_stars(avg_rating):
+    if avg_rating is None:  # Vérification si la note est nulle
+        return "No rating available"
+    
+    filled_stars = int(avg_rating)
+    half_star = avg_rating - filled_stars >= 0.5
+    empty_stars = 5 - filled_stars - (1 if half_star else 0)
+    
+    stars_html = ""
+    for _ in range(filled_stars):
+        stars_html += "★ "
+    if half_star:
+        stars_html += "☆ "
+    for _ in range(empty_stars):
+        stars_html += "☆ "
+    
+    return stars_html
 
 # Bouton pour mettre à jour les résultats
 if st.button("Search"):
@@ -70,5 +86,8 @@ if st.button("Search"):
         st.write(results)
     else:
         st.write("### Results:")
-        for movie_title in results:
-            st.write(f"- {movie_title}")
+        for row in results:
+            movie_title = row[0]
+            avg_rating = row[1]
+            st.write(f"- {movie_title} - Average Rating: {generate_stars(avg_rating)}")
+
