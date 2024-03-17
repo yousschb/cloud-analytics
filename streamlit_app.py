@@ -26,13 +26,15 @@ def get_movie_details(tmdb_id):
 
 def main():
 
-    # Afficher le logo FindYourFilm 
+    # Afficher le logo FindYourFilm avec une légende et des dimensions personnalisées
     st.image(
         'smart.png',
         use_column_width=True,  # Ajuster la largeur de l'image à la largeur de la colonne
     )
 
+    # Ajouter un espace vide entre l'image et la barre de recherche
     st.markdown("<br><br>", unsafe_allow_html=True)
+
 
     # Zone de recherche de titre de film
     movie_name = st.text_input("Enter keywords of the movie name:")
@@ -85,6 +87,8 @@ def main():
                                 tmdb_id = row_tmdb_id.tmdbId
                                 break
 
+
+
                         if tmdb_id:
                             movie_details = get_movie_details(tmdb_id)
                             if movie_details:
@@ -130,24 +134,22 @@ def build_query(movie_name, selected_genre, average_rating, release_year):
             # Si un seul mot-clé est fourni, ne pas ajouter de filtre supplémentaire
             filters.append(keyword_conditions[0])
     
-    # Filtrage des genres
+
+        
     if selected_genre != "All":
-        genre_filters = []
-        # Si le genre sélectionné contient une barre verticale, on considère chacun des genres séparément
+    # Si le genre sélectionné contient une barre verticale, on considère chacun des genres séparément
         if "|" in selected_genre:
             selected_genres = selected_genre.split("|")
-            for genre in selected_genres:
-                genre_filters.append(f"'{genre.strip()}' IN UNNEST(SPLIT(m.genres, '|'))")
+            genre_filters = [f"'{genre}' IN UNNEST(SPLIT(m.genres, '|'))" for genre in selected_genres]
+            filters.append("(" + " OR ".join(genre_filters) + ")")
         else:
             # Si le genre sélectionné ne contient pas de barre verticale, on peut simplement le rechercher dans la colonne genres
-            genre_filters.append(f"'{selected_genre}' IN UNNEST(SPLIT(m.genres, '|'))")
-    
-    # Ajout des filtres avec une logique OR
-    filters.append("(" + " OR ".join(genre_filters) + ")")
+            filters.append(f"'{selected_genre}' IN UNNEST(SPLIT(m.genres, '|'))")
 
-    # Recherche des films contenant ce genre
-    filters.append(f"ARRAY_CONTAINS(SPLIT(m.genres, '|'), '{selected_genre}')")
-        
+    
+    
+    filters.append(f"m.release_year >= {release_year}")
+    
     if filters:
         base_query += " AND " + " AND ".join(filters)
     
