@@ -146,19 +146,14 @@ def build_query(movie_name, selected_genre, average_rating, release_year):
             # Si le genre sélectionné ne contient pas de barre verticale, on peut simplement le rechercher dans la colonne genres
             filters.append(f"'{selected_genre}' IN UNNEST(SPLIT(m.genres, '|'))")
 
-    # Ajouter le filtre pour la note moyenne si une valeur est sélectionnée
-    if average_rating:
-        having_clause = f"HAVING AVG(r.rating) >= {average_rating}"
-        # Ajouter la clause HAVING si elle est définie
-        if having_clause:
-            base_query += " " + having_clause
+    
     
     filters.append(f"m.release_year >= {release_year}")
     
     if filters:
         base_query += " AND " + " AND ".join(filters)
     
-    base_query += " GROUP BY m.title"  # Ne pas ajouter la clause HAVING pour le moment
+    base_query += f" GROUP BY m.title HAVING AVG(r.rating) >= {average_rating}" 
     
     return base_query
 
