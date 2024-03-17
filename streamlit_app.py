@@ -60,12 +60,11 @@ def main():
                     if button_clicked:
                        # Nettoyer le titre du film en enlevant les caractères spéciaux
                         clean_movie_title = ''.join(e for e in movie_title if e.isalnum() or e.isspace()).strip()
+                        
                         # Recherche du tmdb_id correspondant au nom du film sélectionné (après nettoyage)
                         query_tmdb_id = f"""
-                            SELECT tmdbId
+                            SELECT tmdbId, title
                             FROM `caa-assignement-1-417215.Movies.Infos`
-                            WHERE LOWER(title) LIKE LOWER('%{clean_movie_title}%')  -- Utilisation de LIKE pour rechercher les titres similaires
-                            LIMIT 1
                         """
                         query_job_tmdb_id = client.query(query_tmdb_id)
                         results_tmdb_id = query_job_tmdb_id.result()
@@ -73,8 +72,10 @@ def main():
                         # Récupération du tmdbId s'il existe
                         tmdb_id = None
                         for row_tmdb_id in results_tmdb_id:
-                            tmdb_id = row_tmdb_id.tmdbId
-                            break
+                            if clean_movie_title.lower() == ''.join(e for e in row_tmdb_id.title if e.isalnum() or e.isspace()).strip().lower():
+                                tmdb_id = row_tmdb_id.tmdbId
+                                break
+
 
 
                         if tmdb_id:
