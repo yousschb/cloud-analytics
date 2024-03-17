@@ -38,11 +38,11 @@ def main():
     # Curseur pour sélectionner l'année de sortie minimale
     release_year = st.slider("Select minimum release year", min_value=1900, max_value=2022, value=1980)
 
-    # Variable de contrôle pour déterminer si les critères de recherche ont été sélectionnés
-    criteria_selected = movie_name or selected_genre != "---" or average_rating != 3.0 or release_year != 1980
+    # Bouton pour lancer la recherche
+    search_button_clicked = st.button("Search")
 
-    # Requête de filtrage et affichage des résultats si les critères sont sélectionnés
-    if criteria_selected:
+    # Requête de filtrage et affichage des résultats si le bouton de recherche est cliqué
+    if search_button_clicked:
         query = build_query(movie_name, selected_genre, average_rating, release_year)
         if query.strip() == "":
             st.write("Please provide search criteria.")
