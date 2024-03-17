@@ -61,11 +61,13 @@ def main():
                        # Nettoyer le titre du film en enlevant les caractères spéciaux
                         clean_movie_title = ''.join(e for e in movie_title if e.isalnum() or e.isspace()).strip()
                         
-                        # Recherche du tmdb_id correspondant au nom du film sélectionné (après nettoyage)
+                       # Recherche du tmdb_id correspondant au nom du film sélectionné (après nettoyage)
                         query_tmdb_id = f"""
                             SELECT tmdbId, title
                             FROM `caa-assignement-1-417215.Movies.Infos`
+                            WHERE {' AND '.join(f"LOWER(title) LIKE LOWER('%{keyword}%')" for keyword in clean_movie_title.split())}
                         """
+
                         query_job_tmdb_id = client.query(query_tmdb_id)
                         results_tmdb_id = query_job_tmdb_id.result()
                         
