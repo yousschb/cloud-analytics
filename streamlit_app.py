@@ -137,7 +137,7 @@ def build_query(movie_name, selected_genre, average_rating, release_year):
             filters.append(f"'{selected_genre}' IN UNNEST(SPLIT(m.genres, '|'))")
     else:
         # Inclure tous les genres, y compris ceux étiquetés "(no genres listed)"
-        filters.append("(TRUE)")
+        filters.append("(TRUE OR '(no genres listed)' IN UNNEST(SPLIT(m.genres, '|')))")
 
 
 
