@@ -136,8 +136,8 @@ def build_query(movie_name, selected_genre, average_rating, release_year):
             # Si le genre sélectionné ne contient pas de barre verticale, on peut simplement le rechercher dans la colonne genres
             filters.append(f"'{selected_genre}' IN UNNEST(SPLIT(m.genres, '|'))")
     else:
-        # Inclure également les films avec "(no genres listed)" si aucun critère de genre n'est sélectionné
-        filters.append("m.genres = '(no genres listed)'")
+        # Inclure tous les genres, y compris ceux étiquetés "(no genres listed)"
+        filters.append("(TRUE)")
 
 
 
