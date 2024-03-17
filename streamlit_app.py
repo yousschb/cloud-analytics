@@ -39,9 +39,9 @@ def main():
     # Zone de recherche de titre de film
     movie_name = st.text_input("Enter keywords of the movie name:")
 
-    # Liste déroulante pour sélectionner le genre de film
-    genre_choices = ["All", "Action", "Adventure", "Animation", "Children", "Comedy", "Crime", "Documentary", "Drama", "Fantasy", "Film-Noir", "Horror", "IMAX", "Musical", "Mystery", "Romance", "Sci-Fi", "Thriller", "War", "Western"]
-    selected_genre = st.selectbox("Select genre", genre_choices)
+    # Liste des 10 langues les plus présentes dans la database
+    language_choices = ["All", "English", "French", "Japanese", "Italian", "Deutsh", "Espanol", "Swedish", "Finnish", "Chinese", "Russian"]
+    selected_language = st.selectbox("Select language", language_choices)
 
     # Liste des 10 langues les plus présentes dans la database
     language_choices = ["All", "English", "French", "Japanese", "Italian", "Deutsh", "Espanol", "Swedish", "Finnish", "Chinese", "Russian"]
@@ -136,16 +136,17 @@ def build_query(movie_name, selected_genre, selected_language, average_rating, r
             # Si un seul mot-clé est fourni, ne pas ajouter de filtre supplémentaire
             filters.append(keyword_conditions[0])
             
-    # Récupérer le code de langue correspondant
-    language_choices = [All, English, French, Japanese, Italian, German, Spanish, Swedish, Finnish, Chinese, Russian]
+    # Définir les codes de langue correspondant dans le même ordre que les langues
     language_codes = ["---", "en", "fr", "ja", "it", "de", "es", "sv", "fi", "zh", "ru"]
+
     # Récupérer l'indice de la langue sélectionnée dans language_choices
     selected_language_index = language_choices.index(selected_language)
+
     # Utiliser cet indice pour obtenir le code de langue correspondant dans language_codes
     selected_language_code = language_codes[selected_language_index]
 
-    if selected_language_code != "---":
-        filters.append(f"m.language = '{selected_language_code}'")
+if selected_language_code != "---":
+    filters.append(f"m.language = '{selected_language_code}'")
    
     if selected_genre != "All":
     # Si le genre sélectionné contient une barre verticale, on considère chacun des genres séparément
