@@ -97,7 +97,7 @@ def main():
                                 # Afficher l'affiche du film dans la première colonne
                                 if movie_details['poster_path']:
                                     col1.image(f"https://image.tmdb.org/t/p/w500/{movie_details['poster_path']}")
-                                col1.write("     " + generate_stars(avg_rating))
+                                col1.write("", generate_stars(avg_rating), "")
 
                                 # Afficher les informations du film dans la deuxième colonne
                                 col2.write(f"**Title:** {movie_details['title']}")
