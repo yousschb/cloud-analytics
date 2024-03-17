@@ -109,15 +109,20 @@ def build_query(movie_name, selected_genre, average_rating, release_year):
     # Ajouter les filtres en fonction des entrées de l'utilisateur
     filters = []
     
-   # Recherche du tmdb_id correspondant au nom du film sélectionné (après nettoyage)
+    # Recherche du tmdb_id correspondant au nom du film sélectionné (après nettoyage)
     if movie_name:    
         # Construire la condition de recherche pour chaque bloc de mot-clé
         keyword_conditions = []
-        for keyword in movie_name:
+        for keyword in movie_name.split():
             keyword_conditions.append(f"LOWER(m.title) LIKE LOWER('%{keyword}%')")
-    
+        
         # Ajouter les conditions avec un AND pour rechercher les titres contenant tous les blocs de mots-clés
-        filters.append("(" + " AND ".join(keyword_conditions) + ")")
+        if len(keyword_conditions) > 1:  # S'assurer qu'il y a plus d'un mot-clé
+            filters.append("(" + " AND ".join(keyword_conditions) + ")")
+        else:
+            # Si un seul mot-clé est fourni, ne pas ajouter de filtre supplémentaire
+            filters.append(keyword_conditions[0])
+    
 
         
     if selected_genre != "---":
