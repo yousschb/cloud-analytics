@@ -24,8 +24,6 @@ def get_movie_details(tmdb_id):
     else:
         return None
 
-import streamlit as st
-
 def main():
     # Zone de recherche de titre de film
     movie_name = st.text_input("Enter keywords of the movie name:")
@@ -58,43 +56,40 @@ def main():
                 for row in results:
                     movie_title = row[0]
                     avg_rating = row[1]
-                    button_clicked = st.button(f"Details: {movie_title}")
+                    button_clicked = st.button(movie_title)
                     if button_clicked:
-                        show_movie_details(movie_title, avg_rating)
+                        # Recherche du tmdb_id correspondant au nom du film sélectionné
+                        query_tmdb_id = f"""
+                            SELECT tmdbId
+                            FROM `caa-assignement-1-417215.Movies.Infos`
+                            WHERE LOWER(title) = LOWER('{movie_title}')
+                            LIMIT 1
+                        """
+                        query_job_tmdb_id = client.query(query_tmdb_id)
+                        results_tmdb_id = query_job_tmdb_id.result()
+                        for row_tmdb_id in results_tmdb_id:
+                            tmdb_id = row_tmdb_id.tmdbId
+                            break
 
+                        if tmdb_id:
+                            movie_details = get_movie_details(tmdb_id)
+                            if movie_details:
+                                col1, col2 = st.columns([1, 3])  # Diviser la page en 2 colonnes
 
-def show_movie_details(movie_title, avg_rating):
-    # Recherche du tmdb_id correspondant au nom du film sélectionné
-    query_tmdb_id = f"""
-        SELECT tmdbId
-        FROM `caa-assignement-1-417215.Movies.Infos`
-        WHERE LOWER(title) = LOWER('{movie_title}')
-        LIMIT 1
-    """
-    query_job_tmdb_id = client.query(query_tmdb_id)
-    results_tmdb_id = query_job_tmdb_id.result()
-    for row_tmdb_id in results_tmdb_id:
-        tmdb_id = row_tmdb_id.tmdbId
-        break
+                                # Afficher l'affiche du film dans la première colonne
+                                if movie_details['poster_path']:
+                                    col1.image(f"https://image.tmdb.org/t/p/w500/{movie_details['poster_path']}")
 
-    if tmdb_id:
-        movie_details = get_movie_details(tmdb_id)
-        if movie_details:
-            col1, col2 = st.columns([1, 3])  # Diviser la page en 2 colonnes
-
-            # Afficher l'affiche du film dans la première colonne
-            if movie_details['poster_path']:
-                col1.image(f"https://image.tmdb.org/t/p/w500/{movie_details['poster_path']}")
-
-            # Afficher les informations du film dans la deuxième colonne
-            col2.write(f"**Title:** {movie_details['title']}")
-            col2.write(f"**Overview:** {movie_details['overview']}")
-            col2.write(f"**Release Date:** {movie_details['release_date']}")
-            col2.write(f"**Genres:** {', '.join(genre['name'] for genre in movie_details['genres'])}")
-            col2.write(f"**Average Rating:** {generate_stars(avg_rating)}")
-    else:
-        st.write("No movie found with the provided name.")
-
+                                # Afficher les informations du film dans la deuxième colonne
+                                col2.write(f"**Title:** {movie_details['title']}")
+                                col2.write(f"**Overview:** {movie_details['overview']}")
+                                col2.write(f"**Release Date:** {movie_details['release_date']}")
+                                col2.write(f"**Genres:** {', '.join(genre['name'] for genre in movie_details['genres'])}")
+                                col2.write(f"**Average Rating:** {generate_stars(avg_rating)}")
+                            else:
+                                st.write("No movie details found for the provided tmdbId.")
+                        else:
+                            st.write("No movie found with the provided name.")
 
 # Fonction pour construire la requête SQL en fonction des critères de recherche
 def build_query(movie_name, selected_genre, average_rating, release_year):
@@ -106,12 +101,12 @@ def build_query(movie_name, selected_genre, average_rating, release_year):
         """
     # Ajouter les filtres en fonction des entrées de l'utilisateur
     filters = []
-
+    
     if movie_name:
         filters.append(f"LOWER(m.title) LIKE LOWER('%{movie_name}%')")
-
+        
     if selected_genre != "---":
-        # Si le genre sélectionné contient une barre verticale, on considère chacun des genres séparément
+    # Si le genre sélectionné contient une barre verticale, on considère chacun des genres séparément
         if "|" in selected_genre:
             selected_genres = selected_genre.split("|")
             genre_filters = [f"'{genre}' IN UNNEST(SPLIT(m.genres, '|'))" for genre in selected_genres]
@@ -122,12 +117,12 @@ def build_query(movie_name, selected_genre, average_rating, release_year):
 
 
     filters.append(f"m.release_year >= {release_year}")
-
+    
     if filters:
         base_query += " AND " + " AND ".join(filters)
-
+    
     base_query += f" GROUP BY m.title HAVING AVG(r.rating) >= {average_rating}"  # Utilisation de f-string pour insérer la variable
-
+    
     return base_query
 
 
@@ -135,11 +130,11 @@ def build_query(movie_name, selected_genre, average_rating, release_year):
 def generate_stars(avg_rating):
     if avg_rating is None:  # Vérification si la note est nulle
         return "No rating available"
-
+    
     filled_stars = int(avg_rating)
     half_star = avg_rating - filled_stars >= 0.5
     empty_stars = 5 - filled_stars - (1 if half_star else 0)
-
+    
     stars_html = ""
     for _ in range(filled_stars):
         stars_html += "★ "
@@ -147,9 +142,8 @@ def generate_stars(avg_rating):
         stars_html += "☆ "
     for _ in range(empty_stars):
         stars_html += "☆ "
-
+    
     return stars_html
 
 if __name__ == "__main__":
     main()
-
