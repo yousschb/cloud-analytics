@@ -26,8 +26,13 @@ def get_movie_details(tmdb_id):
 
 def main():
 
-    # Ajouter le logo FindYourFilm depuis Google Drive
-    st.image("https://drive.google.com/uc?export=view&id=16EdHflLO4eJTsRNCYhfn48ILH5njeYbo", width=200)
+
+    # Afficher le logo FindYourFilm avec une légende
+    st.image(
+        "https://drive.google.com/uc?export=view&id=16EdHflLO4eJTsRNCYhfn48ILH5njeYbo",
+        use_column_width=True  # Ajuster la largeur de l'image à la largeur de la colonne
+    )
+
 
 
     # Zone de recherche de titre de film
