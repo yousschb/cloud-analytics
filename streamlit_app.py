@@ -26,14 +26,13 @@ def get_movie_details(tmdb_id):
 
 def main():
 
-
-    # Afficher le logo FindYourFilm avec une légende
-    st.image(
-        'findyourfilm-high-resolution-logo.png',
-        use_column_width=True  # Ajuster la largeur de l'image à la largeur de la colonne
-    )
-
-
+    # Afficher le logo FindYourFilm avec une légende et des dimensions personnalisées
+st.image(
+    'findyourfilm-high-resolution-logo.png',
+    use_column_width=True,  # Ajuster la largeur de l'image à la largeur de la colonne
+    width=800,  # Définir la largeur de l'image en pixels
+    height=200  # Définir la hauteur de l'image en pixels
+)
 
     # Zone de recherche de titre de film
     movie_name = st.text_input("Enter keywords of the movie name:")
