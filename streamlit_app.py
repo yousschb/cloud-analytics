@@ -109,11 +109,12 @@ def build_query(movie_name, selected_genre, average_rating, release_year):
     # Si le genre sélectionné contient une barre verticale, on considère chacun des genres séparément
         if "|" in selected_genre:
             selected_genres = selected_genre.split("|")
-            genre_filters = [f"'{genre}' IN UNNEST(m.genres)" for genre in selected_genres]
+            genre_filters = [f"'{genre}' IN UNNEST(SPLIT(m.genres, '|'))" for genre in selected_genres]
             filters.append("(" + " OR ".join(genre_filters) + ")")
         else:
             # Si le genre sélectionné ne contient pas de barre verticale, on peut simplement le rechercher dans la colonne genres
-            filters.append(f"'{selected_genre}' IN UNNEST(m.genres)")
+            filters.append(f"'{selected_genre}' IN UNNEST(SPLIT(m.genres, '|'))")
+
 
     filters.append(f"m.release_year >= {release_year}")
     
