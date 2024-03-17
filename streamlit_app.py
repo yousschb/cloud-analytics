@@ -103,22 +103,12 @@ def main():
             for row in results:
                 movie_title = row[0]
                 avg_rating = row[1]
-                st.write(f"- {movie_title} - Average Rating: {generate_stars(avg_rating)}")
-
-    if 'results' in locals():  # Vérifie si la variable results existe
-        movie_options = [str(row.title) for row in results]
-
-        if not movie_options:
-            st.write("No movie found matching the provided keywords.")
-        else:
-            st.write("Select a movie to view details:")
-            for index, selected_movie in enumerate(movie_options):
-                if st.button(selected_movie, key=f"button_{index}"):  # Utilisation de l'index pour créer une clé unique
+                if st.button(movie_title):  # Afficher le titre du film comme un bouton
                     # Recherche du tmdb_id correspondant au nom du film sélectionné
                     query = f"""
                         SELECT tmdbId
                         FROM `caa-assignement-1-417215.Movies.Infos`
-                        WHERE LOWER(title) = LOWER('{selected_movie}')
+                        WHERE LOWER(title) = LOWER('{movie_title}')
                         LIMIT 1
                     """
                     query_job = client.query(query)
