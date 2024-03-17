@@ -62,11 +62,10 @@ def main():
                         query_tmdb_id = f"""
                             SELECT tmdbId
                             FROM `caa-assignement-1-417215.Movies.Infos`
-                            WHERE LOWER(title) = LOWER(@title)
+                            WHERE LOWER(title) = LOWER('{movie_title}')
                             LIMIT 1
                         """
-                        query_params = [{"name": "title", "parameterType": {"type": "STRING"}, "parameterValue": {"value": movie_title}}]
-                        query_job_tmdb_id = client.query(query_tmdb_id, job_config=bigquery.QueryJobConfig(query_parameters=query_params))
+                        query_job_tmdb_id = client.query(query_tmdb_id)
                         results_tmdb_id = query_job_tmdb_id.result()
                         for row_tmdb_id in results_tmdb_id:
                             tmdb_id = row_tmdb_id.tmdbId
@@ -104,9 +103,7 @@ def build_query(movie_name, selected_genre, average_rating, release_year):
     filters = []
     
     if movie_name:
-        # Échapper les apostrophes dans le titre du film
-        movie_name_escaped = movie_name.replace("'", "''")
-        filters.append(f"LOWER(m.title) LIKE LOWER('%{movie_name_escaped}%')")
+        filters.append(f"LOWER(m.title) LIKE LOWER('%{movie_name}%')")
         
     if selected_genre != "---":
     # Si le genre sélectionné contient une barre verticale, on considère chacun des genres séparément
