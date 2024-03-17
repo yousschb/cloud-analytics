@@ -39,9 +39,9 @@ def main():
     # Zone de recherche de titre de film
     movie_name = st.text_input("Enter keywords of the movie name:")
 
-    # Liste des 10 langues les plus présentes dans la database
-    language_choices = ["All", "English", "French", "Japanese", "Italian", "Deutsh", "Espanol", "Swedish", "Finnish", "Chinese", "Russian"]
-    selected_language = st.selectbox("Select language", language_choices)
+    # Liste déroulante pour sélectionner le genre de film
+    genre_choices = ["All", "Action", "Adventure", "Animation", "Children", "Comedy", "Crime", "Documentary", "Drama", "Fantasy", "Film-Noir", "Horror", "IMAX", "Musical", "Mystery", "Romance", "Sci-Fi", "Thriller", "War", "Western"]
+    selected_genre = st.selectbox("Select genre", genre_choices)
 
     # Liste des 10 langues les plus présentes dans la database
     language_choices = ["All", "English", "French", "Japanese", "Italian", "Deutsh", "Espanol", "Swedish", "Finnish", "Chinese", "Russian"]
