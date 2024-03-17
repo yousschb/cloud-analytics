@@ -33,7 +33,7 @@ def main():
     )
 
     # Ajouter un espace vide entre l'image et la barre de recherche
-    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("<br><br>", unsafe_allow_html=True)
 
 
     # Zone de recherche de titre de film
