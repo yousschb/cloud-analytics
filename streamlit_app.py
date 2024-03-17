@@ -38,51 +38,52 @@ def main():
     # Curseur pour sélectionner l'année de sortie minimale
     release_year = st.slider("Select minimum release year", min_value=1900, max_value=2022, value=1980)
 
-    if st.button("Search"):
-        if movie_name or selected_genre != "---" or release_year != 1980 or average_rating != 3.0:
-            # Requête de filtrage et affichage des résultats
-            query = build_query(movie_name, selected_genre, average_rating, release_year)
-            if query.strip() == "":
-                st.write("Please provide search criteria.")
-            else:
-                query_job = client.query(query)
-                results = query_job.result()
-                if results.total_rows == 0:
-                    st.write("No movies found matching the criteria.")
-                else:
-                    st.write("### Results:")
-                    for row in results:
-                        movie_title = row[0]
-                        avg_rating = row[1]
-                        button_clicked = st.button(movie_title)
-                        if button_clicked:
-                            # Recherche du tmdb_id correspondant au nom du film sélectionné
-                            query_tmdb_id = f"""
-                                SELECT tmdbId
-                                FROM `caa-assignement-1-417215.Movies.Infos`
-                                WHERE LOWER(title) = LOWER('{movie_title}')
-                                LIMIT 1
-                            """
-                            query_job_tmdb_id = client.query(query_tmdb_id)
-                            results_tmdb_id = query_job_tmdb_id.result()
-                            for row_tmdb_id in results_tmdb_id:
-                                tmdb_id = row_tmdb_id.tmdbId
-                                break
+    # Variable de contrôle pour déterminer si les critères de recherche ont été sélectionnés
+    criteria_selected = movie_name or selected_genre != "---" or average_rating != 3.0 or release_year != 1980
 
-                            if tmdb_id:
-                                movie_details = get_movie_details(tmdb_id)
-                                if movie_details:
-                                    st.write(f"**Title:** {movie_details['title']}")
-                                    st.write(f"**Overview:** {movie_details['overview']}")
-                                    st.write(f"**Release Date:** {movie_details['release_date']}")
-                                    st.write(f"**Genres:** {', '.join(genre['name'] for genre in movie_details['genres'])}")
-                                    st.write(f"**Average Rating:** {generate_stars(avg_rating)}")
-                                    if movie_details['poster_path']:
-                                        st.image(f"https://image.tmdb.org/t/p/w500/{movie_details['poster_path']}", use_column_width=True)
-                                else:
-                                    st.write("No movie details found for the provided tmdbId.")
+    # Requête de filtrage et affichage des résultats si les critères sont sélectionnés
+    if criteria_selected:
+        query = build_query(movie_name, selected_genre, average_rating, release_year)
+        if query.strip() == "":
+            st.write("Please provide search criteria.")
+        else:
+            query_job = client.query(query)
+            results = query_job.result()
+            if results.total_rows == 0:
+                st.write("No movies found matching the criteria.")
+            else:
+                st.write("### Results:")
+                for row in results:
+                    movie_title = row[0]
+                    avg_rating = row[1]
+                    button_clicked = st.button(movie_title)
+                    if button_clicked:
+                        # Recherche du tmdb_id correspondant au nom du film sélectionné
+                        query_tmdb_id = f"""
+                            SELECT tmdbId
+                            FROM `caa-assignement-1-417215.Movies.Infos`
+                            WHERE LOWER(title) = LOWER('{movie_title}')
+                            LIMIT 1
+                        """
+                        query_job_tmdb_id = client.query(query_tmdb_id)
+                        results_tmdb_id = query_job_tmdb_id.result()
+                        for row_tmdb_id in results_tmdb_id:
+                            tmdb_id = row_tmdb_id.tmdbId
+                            break
+
+                        if tmdb_id:
+                            movie_details = get_movie_details(tmdb_id)
+                            if movie_details:
+                                st.image(f"https://image.tmdb.org/t/p/w500/{movie_details['poster_path']}", use_column_width=True)
+                                st.write(f"**Title:** {movie_details['title']}")
+                                st.write(f"**Overview:** {movie_details['overview']}")
+                                st.write(f"**Release Date:** {movie_details['release_date']}")
+                                st.write(f"**Genres:** {', '.join(genre['name'] for genre in movie_details['genres'])}")
+                                st.write(f"**Average Rating:** {generate_stars(avg_rating)}")
                             else:
-                                st.write("No movie found with the provided name.")
+                                st.write("No movie details found for the provided tmdbId.")
+                        else:
+                            st.write("No movie found with the provided name.")
 
 # Fonction pour construire la requête SQL en fonction des critères de recherche
 def build_query(movie_name, selected_genre, average_rating, release_year):
