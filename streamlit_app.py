@@ -121,7 +121,7 @@ def build_query(movie_name, selected_genre, average_rating, release_year):
     if filters:
         base_query += " AND " + " AND ".join(filters)
     
-    base_query += f" GROUP BY m.title HAVING AVG(r.rating) >= {average_rating}"  # Utilisation de f-string pour insérer la variable
+    base_query += " GROUP BY m.title"  # Ne pas ajouter la clause HAVING pour le moment
     
     return base_query
 
