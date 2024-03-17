@@ -114,14 +114,15 @@ def build_query(movie_name, selected_genre, average_rating, release_year):
         # Construire la condition de recherche pour chaque bloc de mot-clé
         keyword_conditions = []
         for keyword in movie_name.split():
-            keyword_conditions.append(f"LOWER(m.title) LIKE LOWER('%{keyword}%')")
+            keyword_conditions.append(f"LOWER(m.title) LIKE LOWER('{keyword}')")
         
         # Ajouter les conditions avec un AND pour rechercher les titres contenant tous les blocs de mots-clés
         if len(keyword_conditions) > 1:  # S'assurer qu'il y a plus d'un mot-clé
             filters.append("(" + " AND ".join(keyword_conditions) + ")")
         else:
             # Si un seul mot-clé est fourni, ne pas ajouter de filtre supplémentaire
-            filters.append(f"LOWER(m.title) LIKE LOWER('%{movie_name}%')")
+            filters.append(keyword_conditions[0])
+
 
 
         
