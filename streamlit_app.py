@@ -109,8 +109,11 @@ def build_query(movie_name, selected_genre, average_rating, release_year):
     # Ajouter les filtres en fonction des entrées de l'utilisateur
     filters = []
     
+   # Recherche du tmdb_id correspondant au nom du film sélectionné (après nettoyage)
     if movie_name:
-        filters.append(f"LOWER(m.title) LIKE LOWER('%{movie_name}%')")
+        clean_movie_keywords = ' '.join(e for e in movie_name if e.isalnum() or e.isspace()).strip()
+        filters.extend([f"LOWER(m.title) LIKE LOWER('%{keyword}%')" for keyword in clean_movie_keywords.split()])
+
         
     if selected_genre != "---":
     # Si le genre sélectionné contient une barre verticale, on considère chacun des genres séparément
