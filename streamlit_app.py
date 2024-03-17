@@ -39,24 +39,32 @@ def main():
     # Curseur pour sélectionner l'année de sortie minimale
     release_year = st.slider("Select minimum release year", min_value=1900, max_value=2022, value=1980)
 
-    def build_query():
-        base_query = """
-        SELECT m.title, AVG(r.rating) as avg_rating
-        FROM `caa-assignement-1-417215.Movies.Infos` AS m
-        JOIN `caa-assignement-1-417215.Movies.ratings` AS r ON m.movieId = r.movieId
-        WHERE 1=1
-        """
-        # Ajouter les filtres en fonction des entrées de l'utilisateur
-        filters = []
-        if search_query:
-            filters.append(f"LOWER(m.title) LIKE LOWER('%{search_query}%')")
-        if selected_genre != "---":
-            filters.append(f"LOWER(m.genres) LIKE LOWER('%{selected_genre}%')")
+    # Ajouter un bouton de recherche
+    search_button = st.button("Search")  
+
+    if search_button or movie_name:  # Vérifie si l'utilisateur a entré des mots-clés ou a appuyé sur le bouton de recherche
+        # Recherche de tous les résultats de nom de film contenant les mots clés
+        # Construction de la requête SQL de base
+        def build_query():
+            base_query = """
+            SELECT m.title, AVG(r.rating) as avg_rating
+            FROM `caa-assignement-1-417215.Movies.Infos` AS m
+            JOIN `caa-assignement-1-417215.Movies.ratings` AS r ON m.movieId = r.movieId
+            WHERE 1=1
+            """
+            # Ajouter les filtres en fonction des entrées de l'utilisateur
+            filters = []
+            if search_query:
+                filters.append(f"LOWER(m.title) LIKE LOWER('%{search_query}%')")
+            if selected_genre != "---":
+                filters.append(f"LOWER(m.genres) LIKE LOWER('%{selected_genre}%')")
             filters.append(f"m.release_year >= {release_year}")
             
-        if filters:
-            base_query += " AND " + " AND ".join(filters)
+            if filters:
+                base_query += " AND " + " AND ".join(filters)
+            
             base_query += f" GROUP BY m.title HAVING AVG(r.rating) >= {average_rating}"  # Utilisation de f-string pour insérer la variable
+            
             return base_query
         
         
