@@ -161,9 +161,9 @@ def build_query(movie_name, selected_genre, average_rating, release_year):
     def generate_stars(avg_rating):
         if avg_rating is None:  # Vérification si la note est nulle
             return "No rating available"
-            
+
         ravg_rating = round(avg_rating)
-        filled_stars = ravg_rating
+        filled_stars = int(ravg_rating)
         empty_stars = 5 - filled_stars
         
         stars_html = ""
