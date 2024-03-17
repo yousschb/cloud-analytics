@@ -112,7 +112,15 @@ def build_query(movie_name, selected_genre, average_rating, release_year):
    # Recherche du tmdb_id correspondant au nom du film sélectionné (après nettoyage)
     if movie_name:
         clean_movie_keywords = ' '.join(e for e in movie_name if e.isalnum() or e.isspace()).strip()
-        filters.extend([f"LOWER(m.title) LIKE LOWER('%{keyword}%')" for keyword in clean_movie_keywords.split()])
+        keyword_blocks = clean_movie_keywords.split()  # Séparer les mots-clés en blocs
+    
+        # Construire la condition de recherche pour chaque bloc de mot-clé
+        keyword_conditions = []
+        for keyword in keyword_blocks:
+            keyword_conditions.append(f"LOWER(m.title) LIKE LOWER('%{keyword}%')")
+    
+        # Ajouter les conditions avec un AND pour rechercher les titres contenant tous les blocs de mots-clés
+        filters.append("(" + " AND ".join(keyword_conditions) + ")")
 
         
     if selected_genre != "---":
