@@ -50,7 +50,7 @@ def main():
     release_year = st.slider("Select minimum release year", min_value=1900, max_value=2022, value=1980)
 
     # Variable de contrôle pour déterminer si les critères de recherche ont été sélectionnés
-    criteria_selected = movie_name or selected_genre != "---" or average_rating != 3.0 or release_year != 1980
+    criteria_selected = movie_name or selected_genre != "All" or average_rating != 3.0 or release_year != 1980
 
     # Requête de filtrage et affichage des résultats si les critères sont sélectionnés
     if criteria_selected:
