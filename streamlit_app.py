@@ -29,7 +29,7 @@ def main():
 
     # Afficher le logo FindYourFilm avec une légende
     st.image(
-        "https://drive.google.com/uc?export=view&id=16EdHflLO4eJTsRNCYhfn48ILH5njeYbo",
+        'findyourfilm-high-resolution-logo.png',
         use_column_width=True  # Ajuster la largeur de l'image à la largeur de la colonne
     )
 
