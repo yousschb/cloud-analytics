@@ -70,13 +70,18 @@ def main():
                     if tmdb_id:
                         movie_details = get_movie_details(tmdb_id)
                         if movie_details:
-                            st.write(f"**Title:** {movie_details['title']}")
-                            st.write(f"**Overview:** {movie_details['overview']}")
-                            st.write(f"**Release Date:** {movie_details['release_date']}")
-                            st.write(f"**Genres:** {', '.join(genre['name'] for genre in movie_details['genres'])}")
-                            st.write(f"**Average Vote:** {movie_details['vote_average']}")
+                            col1, col2 = st.columns([1, 3])  # Diviser la page en 2 colonnes
+
+                            # Afficher l'affiche du film dans la première colonne
                             if movie_details['poster_path']:
-                                st.image(f"https://image.tmdb.org/t/p/w500/{movie_details['poster_path']}", caption="Movie Poster", use_column_width=True)
+                                col1.image(f"https://image.tmdb.org/t/p/w500/{movie_details['poster_path']}", caption="Movie Poster")
+
+                            # Afficher les informations du film dans la deuxième colonne
+                            col2.write(f"**Title:** {movie_details['title']}")
+                            col2.write(f"**Overview:** {movie_details['overview']}")
+                            col2.write(f"**Release Date:** {movie_details['release_date']}")
+                            col2.write(f"**Genres:** {', '.join(genre['name'] for genre in movie_details['genres'])}")
+                            col2.write(f"**Average Vote:** {movie_details['vote_average']}")
                         else:
                             st.write("No movie details found for the provided tmdbId.")
                     else:
