@@ -44,62 +44,48 @@ def main():
     # Requête de filtrage et affichage des résultats si les critères sont sélectionnés
     if criteria_selected:
         query = build_query(movie_name, selected_genre, average_rating, release_year)
-    if query.strip() == "":
-        st.write("Please provide search criteria.")
-    else:
-        query_job = client.query(query)
-        results = query_job.result()
-        if results.total_rows == 0:
-            st.write("No movies found matching the criteria.")
+        if query.strip() == "":
+            st.write("Please provide search criteria.")
         else:
-            st.write("### Results:")
-            for row in results:
-                movie_title = row[0]
-                avg_rating = row[1]
-                button_clicked = st.button(movie_title)
-                if button_clicked:
-                    # Recherche du tmdb_id correspondant au nom du film sélectionné
-                    query_tmdb_id = f"""
-                        SELECT tmdbId
-                        FROM `caa-assignement-1-417215.Movies.Infos`
-                        WHERE LOWER(title) = LOWER('{movie_title}')
-                        LIMIT 1
-                    """
-                    query_job_tmdb_id = client.query(query_tmdb_id)
-                    results_tmdb_id = query_job_tmdb_id.result()
-                    for row_tmdb_id in results_tmdb_id:
-                        tmdb_id = row_tmdb_id.tmdbId
-                        break
-
-                    if tmdb_id:
-                        movie_details = get_movie_details(tmdb_id)
-                        if movie_details:
-                            col1, col2 = st.columns([1, 3])  # Diviser la page en 2 colonnes
-
-                            # Afficher l'affiche du film dans la première colonne
-                            if movie_details['poster_path']:
-                                col1.image(f"https://image.tmdb.org/t/p/w500/{movie_details['poster_path']}")
-
-                            # Afficher les informations du film dans la deuxième colonne
-                            col2.write(f"**Title:** {movie_details['title']}")
-                            col2.write(f"**Overview:** {movie_details['overview']}")
-                            col2.write(f"**Release Date:** {movie_details['release_date']}")
-                            col2.write(f"**Genres:** {', '.join(genre['name'] for genre in movie_details['genres'])}")
-                            col2.write(f"**Average Vote:** {movie_details['vote_average']}")
-                        else:
-                            st.write("No movie details found for the provided tmdbId.")
-                    else:
-                        st.write("No movie found with the provided name.")
+            query_job = client.query(query)
+            results = query_job.result()
+            if results.total_rows == 0:
+                st.write("No movies found matching the criteria.")
+            else:
+                st.write("### Results:")
+                for row in results:
+                    movie_title = row[0]
+                    avg_rating = row[1]
+                    button_clicked = st.button(movie_title)
+                    if button_clicked:
+                        # Recherche du tmdb_id correspondant au nom du film sélectionné
+                        query_tmdb_id = f"""
+                            SELECT tmdbId
+                            FROM `caa-assignement-1-417215.Movies.Infos`
+                            WHERE LOWER(title) = LOWER('{movie_title}')
+                            LIMIT 1
+                        """
+                        query_job_tmdb_id = client.query(query_tmdb_id)
+                        results_tmdb_id = query_job_tmdb_id.result()
+                        for row_tmdb_id in results_tmdb_id:
+                            tmdb_id = row_tmdb_id.tmdbId
+                            break
 
                         if tmdb_id:
                             movie_details = get_movie_details(tmdb_id)
                             if movie_details:
-                                st.image(f"https://image.tmdb.org/t/p/w500/{movie_details['poster_path']}", use_column_width=True)
-                                st.write(f"**Title:** {movie_details['title']}")
-                                st.write(f"**Overview:** {movie_details['overview']}")
-                                st.write(f"**Release Date:** {movie_details['release_date']}")
-                                st.write(f"**Genres:** {', '.join(genre['name'] for genre in movie_details['genres'])}")
-                                st.write(f"**Average Rating:** {generate_stars(avg_rating)}")
+                                col1, col2 = st.columns([1, 3])  # Diviser la page en 2 colonnes
+
+                                # Afficher l'affiche du film dans la première colonne
+                                if movie_details['poster_path']:
+                                    col1.image(f"https://image.tmdb.org/t/p/w500/{movie_details['poster_path']}")
+
+                                # Afficher les informations du film dans la deuxième colonne
+                                col2.write(f"**Title:** {movie_details['title']}")
+                                col2.write(f"**Overview:** {movie_details['overview']}")
+                                col2.write(f"**Release Date:** {movie_details['release_date']}")
+                                col2.write(f"**Genres:** {', '.join(genre['name'] for genre in movie_details['genres'])}")
+                                col2.write(f"**Average Rating:** {generate_stars(avg_rating)}")
                             else:
                                 st.write("No movie details found for the provided tmdbId.")
                         else:
