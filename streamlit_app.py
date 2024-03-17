@@ -36,7 +36,7 @@ def main():
     # Ajouter un bouton de recherche
     search_button = st.button("Search")  
 
-    if search_button or movie_name:  # Vérifie si l'utilisateur a entré des mots-clés ou a appuyé sur le bouton de recherche
+    if search_button and movie_name:  # Vérifie si l'utilisateur a entré des mots-clés ou a appuyé sur le bouton de recherche
         # Recherche de tous les résultats de nom de film contenant les mots clés
         query = f"""
             SELECT title
