@@ -132,9 +132,19 @@ def build_query(movie_name, selected_genre, average_rating, release_year):
     
     # Filtrage des genres
     if selected_genre != "All":
-        # Recherche des films ayant exactement ce genre
-        filters.append(f"'{selected_genre}' IN UNNEST(SPLIT(m.genres, '|'))")
+        genre_filters = []
+        # Si le genre sélectionné contient une barre verticale, on considère chacun des genres séparément
+        if "|" in selected_genre:
+            selected_genres = selected_genre.split("|")
+            for genre in selected_genres:
+                genre_filters.append(f"'{genre.strip()}' IN UNNEST(SPLIT(m.genres, '|'))")
+        else:
+            # Si le genre sélectionné ne contient pas de barre verticale, on peut simplement le rechercher dans la colonne genres
+            genre_filters.append(f"'{selected_genre}' IN UNNEST(SPLIT(m.genres, '|'))")
     
+    # Ajout des filtres avec une logique OR
+    filters.append("(" + " OR ".join(genre_filters) + ")")
+
     # Recherche des films contenant ce genre
     filters.append(f"ARRAY_CONTAINS(SPLIT(m.genres, '|'), '{selected_genre}')")
         
