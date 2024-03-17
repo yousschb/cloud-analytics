@@ -28,9 +28,8 @@ def main():
 
     # Afficher le logo FindYourFilm avec une légende et des dimensions personnalisées
     st.image(
-        'findyourfilm-high-resolution-logo.png',
+        'smart.png',
         use_column_width=True,  # Ajuster la largeur de l'image à la largeur de la colonne
-        width=200  # Définir la largeur de l'image en pixels
     )
 
 
