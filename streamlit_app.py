@@ -103,10 +103,9 @@ def build_query(movie_name, selected_genre, average_rating, release_year):
     filters = []
     if movie_name:
         filters.append(f"LOWER(m.title) LIKE LOWER('%{movie_name}%')")
-    # Ajouter le filtre de genre uniquement si un genre est sélectionné
     if selected_genre != "---":
-        filters.append(f"','{selected_genre}','" in row.genres)
-
+        # Sélectionner les films ayant le genre choisi
+        filters.append(f"({selected_genre} IN UNNEST(m.genres))")
     filters.append(f"m.release_year >= {release_year}")
     
     if filters:
@@ -115,6 +114,7 @@ def build_query(movie_name, selected_genre, average_rating, release_year):
     base_query += f" GROUP BY m.title HAVING AVG(r.rating) >= {average_rating}"  # Utilisation de f-string pour insérer la variable
     
     return base_query
+
 
 # Fonction pour générer des étoiles en fonction de la note
 def generate_stars(avg_rating):
