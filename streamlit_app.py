@@ -24,6 +24,19 @@ def get_movie_details(tmdb_id):
     else:
         return None
 
+# Requête de filtrage et affichage des résultats
+def update_results():
+    query = build_query()
+    if query.strip() == "":
+        return "Please provide search criteria."
+    else:
+        query_job = client.query(query)
+        results = query_job.result()
+        if results.total_rows == 0:
+            return "No movies found matching the criteria."
+        else:
+            return results
+
 # Fonction pour générer des étoiles en fonction de la note
 def generate_stars(avg_rating):
     if avg_rating is None:  # Vérification si la note est nulle
@@ -42,19 +55,6 @@ def generate_stars(avg_rating):
         stars_html += "☆ "
     
     return stars_html
-
-# Requête de filtrage et affichage des résultats
-def update_results():
-    query = build_query()
-    if query.strip() == "":
-        return "Please provide search criteria."
-    else:
-        query_job = client.query(query)
-        results = query_job.result()
-        if results.total_rows == 0:
-            return "No movies found matching the criteria."
-        else:
-            return results
 
 def main():
 
@@ -99,8 +99,8 @@ def main():
                         LIMIT 1
                     """
                     query_job = client.query(query)
-                    results_tmdb = query_job.result()
-                    for row in results_tmdb:
+                    results = query_job.result()
+                    for row in results:
                         tmdb_id = row.tmdbId
                         break
 
