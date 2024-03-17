@@ -97,12 +97,12 @@ def main():
                                 # Afficher l'affiche du film dans la première colonne
                                 if movie_details['poster_path']:
                                     col1.image(f"https://image.tmdb.org/t/p/w500/{movie_details['poster_path']}")
-                                col1.write(generate_stars(avg_rating), unsafe_allow_html=True)
+                                col1.write(generate_stars(avg_rating))
 
                                 # Afficher les informations du film dans la deuxième colonne
                                 col2.write(f"**Title:** {movie_details['title']}")
                                 col2.write(f"**Overview:** {movie_details['overview']}")
-                                col2.write(f"**Release Date:** {movie_details['release_date']}")
+                                col2.write(f"**Release Date:** {movie_details['release_date']}" + f"**                 Genres:** {', '.join(genre['name'] for genre in movie_details['genres'])}")
                                 col2.write(f"**Language:** {movie_details['original_language']}")
                                 col2.write(f"**Genres:** {', '.join(genre['name'] for genre in movie_details['genres'])}")
 
