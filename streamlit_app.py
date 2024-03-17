@@ -137,7 +137,8 @@ def build_query(movie_name, selected_genre, selected_language, average_rating, r
             filters.append(keyword_conditions[0])
 
     if selected_language != "All":
-        filters.append(f"m.language = '{selected_language}'")
+        filters.append(f"m.language LIKE '%{selected_language}%'")
+
        
     if selected_genre != "All":
     # Si le genre sélectionné contient une barre verticale, on considère chacun des genres séparément
