@@ -158,21 +158,27 @@ def build_query(movie_name, selected_genre, average_rating, release_year):
     return base_query
     
 # Fonction pour générer des étoiles en fonction de la note
-    def generate_stars(avg_rating):
-        if avg_rating is None:  # Vérification si la note est nulle
-            return "No rating available"
+def generate_stars(avg_rating):
+    if avg_rating is None:  # Vérification si la note est nulle
+        return "No rating available"
 
-        ravg_rating = round(avg_rating)
-        filled_stars = int(ravg_rating)
-        empty_stars = 5 - filled_stars
-        
-        stars_html = ""
-        for _ in range(filled_stars):
-            stars_html += "★ "
-        for _ in range(empty_stars):
-            stars_html += "☆ "
-        
-        return stars_html
+    filled_stars = int(avg_rating)  # Partie entière de la note moyenne
+    decimal_part = avg_rating - filled_stars  # Partie décimale de la note moyenne
+
+    # Si la partie décimale est supérieure ou égale à 0.5, arrondir à l'entier supérieur
+    if decimal_part >= 0.5:
+        filled_stars += 1
+
+    empty_stars = 5 - filled_stars
+    
+    stars_html = ""
+    for _ in range(filled_stars):
+        stars_html += "★ "
+    for _ in range(empty_stars):
+        stars_html += "☆ "
+    
+    return stars_html
+
 
 
 if __name__ == "__main__":
