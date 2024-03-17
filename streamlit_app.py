@@ -29,7 +29,7 @@ def main():
     movie_name = st.text_input("Enter keywords of the movie name:")
 
     # Liste déroulante pour sélectionner le genre de film
-    genre_choices = ["---", "Action", "Comedy", "Drama", "Horror", "Science Fiction"]
+    genre_choices = ["---", "Action", "Adventure", "Animation", "Children", "Comedy", "Crime", "Documentary", "Drama", "Fantasy", "Film-Noir", "Horror", "IMAX", "Musical", "Mystery", "Romance", "Sci-Fi", "Thriller", "War", "Western"]
     selected_genre = st.selectbox("Select genre", genre_choices)
 
     # Curseur pour sélectionner la note moyenne
