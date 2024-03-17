@@ -58,15 +58,21 @@ def main():
                     avg_rating = row[1]
                     button_clicked = st.button(movie_title)
                     if button_clicked:
-                        # Recherche du tmdb_id correspondant au nom du film sélectionné
+                        # Nettoyer le titre du film en enlevant les caractères spéciaux
+                        clean_movie_title = ''.join(e for e in movie_title if e.isalnum() or e.isspace()).strip()
+                        
+                        # Recherche du tmdb_id correspondant au nom du film sélectionné (après nettoyage)
                         query_tmdb_id = f"""
                             SELECT tmdbId
                             FROM `caa-assignement-1-417215.Movies.Infos`
-                            WHERE LOWER(title) = LOWER('{movie_title}')
+                            WHERE LOWER(title) = LOWER('{clean_movie_title}')
                             LIMIT 1
                         """
                         query_job_tmdb_id = client.query(query_tmdb_id)
                         results_tmdb_id = query_job_tmdb_id.result()
+                        
+                        # Récupération du tmdbId s'il existe
+                        tmdb_id = None
                         for row_tmdb_id in results_tmdb_id:
                             tmdb_id = row_tmdb_id.tmdbId
                             break
