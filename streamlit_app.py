@@ -101,11 +101,20 @@ def build_query(movie_name, selected_genre, average_rating, release_year):
         """
     # Ajouter les filtres en fonction des entrées de l'utilisateur
     filters = []
+    
     if movie_name:
         filters.append(f"LOWER(m.title) LIKE LOWER('%{movie_name}%')")
+        
     if selected_genre != "---":
-        # Encapsuler le genre sélectionné entre guillemets simples
+    # Si le genre sélectionné contient une barre verticale, on considère chacun des genres séparément
+    if "|" in selected_genre:
+        selected_genres = selected_genre.split("|")
+        genre_filters = [f"'{genre}' IN UNNEST(m.genres)" for genre in selected_genres]
+        filters.append("(" + " OR ".join(genre_filters) + ")")
+    else:
+        # Si le genre sélectionné ne contient pas de barre verticale, on peut simplement le rechercher dans la colonne genres
         filters.append(f"'{selected_genre}' IN UNNEST(m.genres)")
+
     filters.append(f"m.release_year >= {release_year}")
     
     if filters:
