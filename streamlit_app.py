@@ -44,7 +44,7 @@ def main():
     selected_genre = st.selectbox("Select genre", genre_choices)
 
     # Liste des 10 langues les plus présentes dans la database
-    language_choices = ["---", "English", "French", "Japanese", "Italian", "Deutsh", "Espanol", "Swedish", "Finnish", "Chinese", "Russian"]
+    language_choices = ["All", "English", "French", "Japanese", "Italian", "Deutsh", "Espanol", "Swedish", "Finnish", "Chinese", "Russian"]
     selected_language = st.selectbox("Select language", language_choices)
 
     # Curseur pour sélectionner la note moyenne
@@ -54,7 +54,7 @@ def main():
     release_year = st.slider("Select minimum release year", min_value=1900, max_value=2024, value=1980)
 
     # Variable de contrôle pour déterminer si les critères de recherche ont été sélectionnés
-    criteria_selected = movie_name or selected_genre != "---" or selected_language != "---" or average_rating != 3.0 or release_year != 1980
+    criteria_selected = movie_name or selected_genre != "All" or selected_language != "All" or average_rating != 3.0 or release_year != 1980
 
     # Requête de filtrage et affichage des résultats si les critères sont sélectionnés
     if criteria_selected:
@@ -135,9 +135,13 @@ def build_query(movie_name, selected_genre, selected_language, average_rating, r
         else:
             # Si un seul mot-clé est fourni, ne pas ajouter de filtre supplémentaire
             filters.append(keyword_conditions[0])
-    
-    if selected_language != "---":
-        filters.append(f"m.language = '{selected_language[:2]}'")
+            
+    # Récupérer le code de langue correspondant
+    language_codes = ["---", "en", "fr", "ja", "it", "de", "es", "sv", "fi", "zh", "ru"]
+    selected_language_code = language_codes[language_choices.index(selected_language)]
+
+    if selected_language_code != "All":
+        filters.append(f"m.language = '{selected_language_code[:2]}'")
         
     if selected_genre != "All":
     # Si le genre sélectionné contient une barre verticale, on considère chacun des genres séparément
