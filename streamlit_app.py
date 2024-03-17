@@ -106,7 +106,7 @@ def main():
                 st.write(f"- {movie_title} - Average Rating: {generate_stars(avg_rating)}")
 
     if 'results' in locals():  # Vérifie si la variable results existe
-        movie_options = [row.title for row in results]
+        movie_options = [str(row.title) for row in results]
 
         if not movie_options:
             st.write("No movie found matching the provided keywords.")
