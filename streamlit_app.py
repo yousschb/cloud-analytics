@@ -24,6 +24,8 @@ def get_movie_details(tmdb_id):
     else:
         return None
 
+import streamlit as st
+
 def main():
     # Zone de recherche de titre de film
     movie_name = st.text_input("Enter keywords of the movie name:")
@@ -38,11 +40,11 @@ def main():
     # Curseur pour sélectionner l'année de sortie minimale
     release_year = st.slider("Select minimum release year", min_value=1900, max_value=2022, value=1980)
 
-    # Bouton pour lancer la recherche
-    search_button_clicked = st.button("Search")
+    # Variable de contrôle pour déterminer si les critères de recherche ont été sélectionnés
+    criteria_selected = movie_name or selected_genre != "---" or average_rating != 3.0 or release_year != 1980
 
-    # Requête de filtrage et affichage des résultats si le bouton de recherche est cliqué
-    if search_button_clicked:
+    # Requête de filtrage et affichage des résultats si les critères sont sélectionnés
+    if criteria_selected:
         query = build_query(movie_name, selected_genre, average_rating, release_year)
         if query.strip() == "":
             st.write("Please provide search criteria.")
@@ -56,7 +58,8 @@ def main():
                 for row in results:
                     movie_title = row[0]
                     avg_rating = row[1]
-                    if st.button(movie_title):
+                    button_clicked = st.button(f"Details: {movie_title}")
+                    if button_clicked:
                         show_movie_details(movie_title, avg_rating)
 
 
@@ -117,6 +120,7 @@ def build_query(movie_name, selected_genre, average_rating, release_year):
             # Si le genre sélectionné ne contient pas de barre verticale, on peut simplement le rechercher dans la colonne genres
             filters.append(f"'{selected_genre}' IN UNNEST(SPLIT(m.genres, '|'))")
 
+
     filters.append(f"m.release_year >= {release_year}")
 
     if filters:
@@ -145,7 +149,6 @@ def generate_stars(avg_rating):
         stars_html += "☆ "
 
     return stars_html
-
 
 if __name__ == "__main__":
     main()
