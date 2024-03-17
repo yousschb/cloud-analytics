@@ -43,18 +43,22 @@ def main():
     genre_choices = ["All", "Action", "Adventure", "Animation", "Children", "Comedy", "Crime", "Documentary", "Drama", "Fantasy", "Film-Noir", "Horror", "IMAX", "Musical", "Mystery", "Romance", "Sci-Fi", "Thriller", "War", "Western"]
     selected_genre = st.selectbox("Select genre", genre_choices)
 
+    # Liste des 10 langues les plus présentes dans la database
+    language_choices = ["---", "English", "French", "Japanese", "Italian", "Deutsh", "Espanol", "Swedish", "Finnish", "Chinese", "Russian"]
+    selected_language = st.selectbox("Select language", language_choices)
+
     # Curseur pour sélectionner la note moyenne
     average_rating = st.slider("Select minimum average rating", min_value=0.0, max_value=5.0, step=0.1, value=3.0)
 
     # Curseur pour sélectionner l'année de sortie minimale
-    release_year = st.slider("Select minimum release year", min_value=1900, max_value=2022, value=1980)
+    release_year = st.slider("Select minimum release year", min_value=1900, max_value=2024, value=1980)
 
     # Variable de contrôle pour déterminer si les critères de recherche ont été sélectionnés
-    criteria_selected = movie_name or selected_genre != "All" or average_rating != 3.0 or release_year != 1980
+    criteria_selected = movie_name or selected_genre != "---" or selected_language != "---" or average_rating != 3.0 or release_year != 1980
 
     # Requête de filtrage et affichage des résultats si les critères sont sélectionnés
     if criteria_selected:
-        query = build_query(movie_name, selected_genre, average_rating, release_year)
+        query = build_query(movie_name, selected_language, selected_genre, average_rating, release_year)
         if query.strip() == "":
             st.write("Please provide search criteria.")
         else:
@@ -86,9 +90,6 @@ def main():
                             if clean_movie_title.lower() == ''.join(e for e in row_tmdb_id.title if e.isalnum() or e.isspace()).strip().lower():
                                 tmdb_id = row_tmdb_id.tmdbId
                                 break
-
-
-
                         if tmdb_id:
                             movie_details = get_movie_details(tmdb_id)
                             if movie_details:
@@ -108,9 +109,10 @@ def main():
                                 st.write("No movie details found for the provided tmdbId.")
                         else:
                             st.write("No movie found with the provided name.")
+                            
 
 # Fonction pour construire la requête SQL en fonction des critères de recherche
-def build_query(movie_name, selected_genre, average_rating, release_year):
+def build_query(movie_name, selected_genre, selected_language, average_rating, release_year):
     base_query = """
         SELECT m.title, AVG(r.rating) as avg_rating
         FROM `caa-assignement-1-417215.Movies.Infos` AS m
@@ -119,7 +121,7 @@ def build_query(movie_name, selected_genre, average_rating, release_year):
         """
     # Ajouter les filtres en fonction des entrées de l'utilisateur
     filters = []
-    
+
     # Recherche du tmdb_id correspondant au nom du film sélectionné (après nettoyage)
     if movie_name:    
         # Construire la condition de recherche pour chaque bloc de mot-clé
@@ -134,7 +136,8 @@ def build_query(movie_name, selected_genre, average_rating, release_year):
             # Si un seul mot-clé est fourni, ne pas ajouter de filtre supplémentaire
             filters.append(keyword_conditions[0])
     
-
+    if selected_language != "---":
+        filters.append(f"m.language = '{selected_language[:2]}'")
         
     if selected_genre != "All":
     # Si le genre sélectionné contient une barre verticale, on considère chacun des genres séparément
@@ -146,7 +149,6 @@ def build_query(movie_name, selected_genre, average_rating, release_year):
             # Si le genre sélectionné ne contient pas de barre verticale, on peut simplement le rechercher dans la colonne genres
             filters.append(f"'{selected_genre}' IN UNNEST(SPLIT(m.genres, '|'))")
 
-    
     
     filters.append(f"m.release_year >= {release_year}")
     
