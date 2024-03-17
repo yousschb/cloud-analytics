@@ -96,18 +96,19 @@ def main():
 
                                 # Afficher l'affiche du film dans la première colonne
                                 if movie_details['poster_path']:
-                                    col1.image(f"https://image.tmdb.org/t/p/w500/{movie_details['poster_path']}")
+                                col1.image(f"https://image.tmdb.org/t/p/w500/{movie_details['poster_path']}")
 
                                 # Afficher les informations du film dans la deuxième colonne
                                 col2.write(f"**Title:** {movie_details['title']}")
                                 col2.write(f"**Overview:** {movie_details['overview']}")
                                 col2.write(f"**Release Date:** {movie_details['release_date']}")
+                                col2.write(f"**Language:** {movie_details['language']}")
                                 col2.write(f"**Genres:** {', '.join(genre['name'] for genre in movie_details['genres'])}")
-                                col2.write(f"**Average Rating:** {generate_stars(avg_rating)}")
-                            else:
-                                st.write("No movie details found for the provided tmdbId.")
-                        else:
-                            st.write("No movie found with the provided name.")
+                                
+                                # Afficher les étoiles de notation sous l'affiche du film
+                                if avg_rating is not None:
+                                    col1.write(f"**Average Rating:** {generate_stars(avg_rating)}")
+
                             
 
 # Fonction pour construire la requête SQL en fonction des critères de recherche
