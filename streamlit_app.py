@@ -136,7 +136,7 @@ def build_query(movie_name, selected_genre, average_rating, release_year):
     
 
         
-    if selected_genre != "---":
+    if selected_genre != "All":
     # Si le genre sélectionné contient une barre verticale, on considère chacun des genres séparément
         if "|" in selected_genre:
             selected_genres = selected_genre.split("|")
