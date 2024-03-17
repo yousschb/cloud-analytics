@@ -45,7 +45,7 @@ def main():
 
     # Liste des 10 langues les plus présentes dans la database
     language_choices = ["All", "English", "French", "Japanese", "Italian", "Deutsh", "Espanol", "Swedish", "Finnish", "Chinese", "Russian"]
-    selected_language = st.selectbox("Select language", language_choices)
+    selected_language = st.selectbox("Select language", language_choices, key="language_select")
 
     # Curseur pour sélectionner la note moyenne
     average_rating = st.slider("Select minimum average rating", min_value=0.0, max_value=5.0, step=0.1, value=3.0)
