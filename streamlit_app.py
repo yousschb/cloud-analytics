@@ -156,26 +156,25 @@ def build_query(movie_name, selected_genre, average_rating, release_year):
     base_query += f" GROUP BY m.title HAVING AVG(r.rating) >= {average_rating}" 
     
     return base_query
-
-
+    
 # Fonction pour générer des étoiles en fonction de la note
-def generate_stars(avg_rating):
-    if avg_rating is None:  # Vérification si la note est nulle
-        return "No rating available"
-    
-    filled_stars = int(avg_rating)
-    half_star = avg_rating - filled_stars >= 0.5
-    empty_stars = 5 - filled_stars - (1 if half_star else 0)
-    
-    stars_html = ""
-    for _ in range(filled_stars):
-        stars_html += "★ "
-    if half_star:
-        stars_html += "☆ "
-    for _ in range(empty_stars):
-        stars_html += "☆ "
-    
-    return stars_html
+    def generate_stars(avg_rating):
+        if avg_rating is None:  # Vérification si la note est nulle
+            return "No rating available"
+        
+        rounded_avg_rating = round(avg_rating)  # Arrondir la note moyenne à l'entier le plus proche
+        
+        filled_stars = rounded_avg_rating
+        empty_stars = 5 - filled_stars
+        
+        stars_html = ""
+        for _ in range(filled_stars):
+            stars_html += "★ "
+        for _ in range(empty_stars):
+            stars_html += "☆ "
+        
+        return stars_html
+
 
 if __name__ == "__main__":
     main()
