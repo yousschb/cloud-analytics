@@ -25,10 +25,18 @@ def get_movie_details(tmdb_id):
         return None
 
 def main():
-    movie_name = st.text_input("Enter keywords of the movie name:")
-    search_button = st.button("Search")  # Ajouter un bouton de recherche
 
-    if search_button:  # Vérifie si l'utilisateur a entré des mots-clés ou a appuyé sur le bouton de recherche
+    # Zone de recherche de titre de film
+    movie_name = st.text_input("Enter keywords of the movie name:")
+
+    # Liste déroulante pour sélectionner le genre de film
+    genre_choices = ["---", "Action", "Comedy", "Drama", "Horror", "Science Fiction"]
+    selected_genre = st.selectbox("Select genre", genre_choices)
+
+    # Ajouter un bouton de recherche
+    search_button = st.button("Search")  
+
+    if search_button or movie_name:  # Vérifie si l'utilisateur a entré des mots-clés ou a appuyé sur le bouton de recherche
         # Recherche de tous les résultats de nom de film contenant les mots clés
         query = f"""
             SELECT title
