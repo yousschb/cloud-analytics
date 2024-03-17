@@ -32,6 +32,9 @@ def main():
         use_column_width=True,  # Ajuster la largeur de l'image à la largeur de la colonne
     )
 
+    # Ajouter un espace vide entre l'image et la barre de recherche
+    st.markdown("<br>", unsafe_allow_html=True)
+
 
     # Zone de recherche de titre de film
     movie_name = st.text_input("Enter keywords of the movie name:")
