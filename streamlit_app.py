@@ -24,6 +24,25 @@ def get_movie_details(tmdb_id):
     else:
         return None
 
+# Fonction pour générer des étoiles en fonction de la note moyenne
+def generate_stars(avg_rating):
+    if avg_rating is None:  # Vérification si la note est nulle
+        return "No rating available"
+    
+    filled_stars = int(avg_rating)
+    half_star = avg_rating - filled_stars >= 0.5
+    empty_stars = 5 - filled_stars - (1 if half_star else 0)
+    
+    stars_html = ""
+    for _ in range(filled_stars):
+        stars_html += "★ "
+    if half_star:
+        stars_html += "☆ "
+    for _ in range(empty_stars):
+        stars_html += "☆ "
+    
+    return stars_html
+
 def main():
     # Zone de recherche de titre de film
     movie_name = st.text_input("Enter keywords of the movie name:")
@@ -81,7 +100,7 @@ def main():
                             col2.write(f"**Overview:** {movie_details['overview']}")
                             col2.write(f"**Release Date:** {movie_details['release_date']}")
                             col2.write(f"**Genres:** {', '.join(genre['name'] for genre in movie_details['genres'])}")
-                            col2.write(f"**Average Vote:** {movie_details['vote_average']}")
+                            col2.write(f"**Average Rating:** {generate_stars(avg_rating)}")
                         else:
                             st.write("No movie details found for the provided tmdbId.")
                     else:
