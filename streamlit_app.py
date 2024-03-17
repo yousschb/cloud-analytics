@@ -96,7 +96,7 @@ def build_query(movie_name, selected_genre, average_rating, release_year):
     base_query = """
         SELECT m.title, AVG(r.rating) as avg_rating
         FROM `caa-assignement-1-417215.Movies.Infos` AS m
-        JOIN `caa-assignement-1-417215.Movies.ratings` AS r ON m.tmdbId = r.movieId
+        JOIN `caa-assignement-1-417215.Movies.ratings` AS r ON m.movieId = r.movieId
         WHERE 1=1
         """
     # Ajouter les filtres en fonction des entrées de l'utilisateur
@@ -104,8 +104,8 @@ def build_query(movie_name, selected_genre, average_rating, release_year):
     if movie_name:
         filters.append(f"LOWER(m.title) LIKE LOWER('%{movie_name}%')")
     if selected_genre != "---":
-        # Sélectionner les films ayant le genre choisi
-        filters.append(f"({selected_genre} IN UNNEST(m.genres))")
+        # Encapsuler le genre sélectionné entre guillemets simples
+        filters.append(f"'{selected_genre}' IN UNNEST(m.genres)")
     filters.append(f"m.release_year >= {release_year}")
     
     if filters:
