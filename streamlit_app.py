@@ -26,15 +26,13 @@ def get_movie_details(tmdb_id):
 
 def main():
 
-    # Afficher le logo FindYourFilm avec une légende et des dimensions personnalisées
+    # Afficher le logo FindYourFilm 
     st.image(
         'smart.png',
         use_column_width=True,  # Ajuster la largeur de l'image à la largeur de la colonne
     )
 
-    # Ajouter un espace vide entre l'image et la barre de recherche
     st.markdown("<br><br>", unsafe_allow_html=True)
-
 
     # Zone de recherche de titre de film
     movie_name = st.text_input("Enter keywords of the movie name:")
@@ -50,7 +48,7 @@ def main():
     release_year = st.slider("Select minimum release year", min_value=1900, max_value=2022, value=1980)
 
     # Variable de contrôle pour déterminer si les critères de recherche ont été sélectionnés
-    criteria_selected = movie_name or selected_genre != "All" or average_rating != 3.0 or release_year != 1980
+    criteria_selected = selected_genre != "All" or average_rating != 3.0 or release_year != 1980
 
     # Requête de filtrage et affichage des résultats si les critères sont sélectionnés
     if criteria_selected:
