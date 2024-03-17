@@ -109,8 +109,14 @@ def build_query(movie_name, selected_genre, average_rating, release_year):
     # Ajouter les filtres en fonction des entrées de l'utilisateur
     filters = []
     
+    # Créer la condition SQL pour la correspondance du titre du film
     if movie_name:
-        filters.append(f"LOWER(m.title) LIKE LOWER('%{movie_name}%')")
+        # Modifier la condition pour rechercher tous les mots du titre nettoyé dans n'importe quel ordre
+        conditions = []
+        for word in clean_movie_title_words:
+            conditions.append(f"LOWER(m.title) LIKE LOWER('%{word}%')")
+        filters.append("(" + " AND ".join(conditions) + ")")
+
         
     if selected_genre != "---":
     # Si le genre sélectionné contient une barre verticale, on considère chacun des genres séparément
