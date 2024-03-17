@@ -105,7 +105,7 @@ def build_query(movie_name, selected_genre, average_rating, release_year):
         filters.append(f"LOWER(m.title) LIKE LOWER('%{movie_name}%')")
     # Ajouter le filtre de genre uniquement si un genre est sélectionné
     if selected_genre != "---":
-        filters.append(f"','{selected_genre}','" in m.genres)
+        filters.append(f"','{selected_genre}','" in row.genres)
 
     filters.append(f"m.release_year >= {release_year}")
     
