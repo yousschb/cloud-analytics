@@ -146,7 +146,7 @@ def build_query(movie_name, selected_genre, average_rating, release_year):
             # Si le genre sélectionné ne contient pas de barre verticale, on peut simplement le rechercher dans la colonne genres
             filters.append(f"'{selected_genre}' IN UNNEST(SPLIT(m.genres, '|'))")
 
-
+    filters.append(f"AVG(r.rating) >= {average_rating}")
     filters.append(f"m.release_year >= {release_year}")
     
     if filters:
