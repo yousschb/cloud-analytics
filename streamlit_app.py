@@ -121,8 +121,8 @@ def build_query(movie_name, selected_genre, average_rating, release_year):
             filters.append("(" + " AND ".join(keyword_conditions) + ")")
         else:
             # Si un seul mot-clé est fourni, ne pas ajouter de filtre supplémentaire
-            filters.append(keyword_conditions[0])
-    
+            filters.append(f"LOWER(m.title) LIKE LOWER('%{movie_name}%')")
+
 
         
     if selected_genre != "---":
