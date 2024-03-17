@@ -58,14 +58,13 @@ def main():
                     avg_rating = row[1]
                     button_clicked = st.button(movie_title)
                     if button_clicked:
-                        # Nettoyer le titre du film en enlevant les caractères spéciaux
+                       # Nettoyer le titre du film en enlevant les caractères spéciaux
                         clean_movie_title = ''.join(e for e in movie_title if e.isalnum() or e.isspace()).strip()
-                        
                         # Recherche du tmdb_id correspondant au nom du film sélectionné (après nettoyage)
                         query_tmdb_id = f"""
                             SELECT tmdbId
                             FROM `caa-assignement-1-417215.Movies.Infos`
-                            WHERE LOWER(title) = LOWER('{clean_movie_title}')
+                            WHERE LOWER(title) LIKE LOWER('%{clean_movie_title}%')  -- Utilisation de LIKE pour rechercher les titres similaires
                             LIMIT 1
                         """
                         query_job_tmdb_id = client.query(query_tmdb_id)
@@ -76,6 +75,7 @@ def main():
                         for row_tmdb_id in results_tmdb_id:
                             tmdb_id = row_tmdb_id.tmdbId
                             break
+
 
                         if tmdb_id:
                             movie_details = get_movie_details(tmdb_id)
