@@ -35,7 +35,6 @@ def main():
     # Ajouter un espace vide entre l'image et la barre de recherche
     st.markdown("<br><br>", unsafe_allow_html=True)
 
-
     # Zone de recherche de titre de film
     movie_name = st.text_input("Enter keywords of the movie name:")
 
@@ -58,7 +57,7 @@ def main():
 
     # Requête de filtrage et affichage des résultats si les critères sont sélectionnés
     if criteria_selected:
-        query = build_query(movie_name, selected_language, selected_genre, average_rating, release_year)
+        query = build_query(movie_name, selected_genre, selected_language, average_rating, release_year)
         if query.strip() == "":
             st.write("Please provide search criteria.")
         else:
@@ -136,10 +135,6 @@ def build_query(movie_name, selected_genre, selected_language, average_rating, r
             # Si un seul mot-clé est fourni, ne pas ajouter de filtre supplémentaire
             filters.append(keyword_conditions[0])
 
-    if selected_language != "All":
-        filters.append(f"m.language LIKE '%{selected_language}%'")
-
-       
     if selected_genre != "All":
     # Si le genre sélectionné contient une barre verticale, on considère chacun des genres séparément
         if "|" in selected_genre:
@@ -150,7 +145,9 @@ def build_query(movie_name, selected_genre, selected_language, average_rating, r
             # Si le genre sélectionné ne contient pas de barre verticale, on peut simplement le rechercher dans la colonne genres
             filters.append(f"'{selected_genre}' IN UNNEST(SPLIT(m.genres, '|'))")
 
-    
+    if selected_language != "All":
+         filters.append(f"m.language = '{selected_language}'")
+
     filters.append(f"m.release_year >= {release_year}")
     
     if filters:
