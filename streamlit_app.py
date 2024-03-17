@@ -135,19 +135,18 @@ def build_query(movie_name, selected_genre, selected_language, average_rating, r
         else:
             # Si un seul mot-clé est fourni, ne pas ajouter de filtre supplémentaire
             filters.append(keyword_conditions[0])
+        
             
     # Définir les codes de langue correspondant dans le même ordre que les langues
     language_codes = ["---", "en", "fr", "ja", "it", "de", "es", "sv", "fi", "zh", "ru"]
-
     # Récupérer l'indice de la langue sélectionnée dans language_choices
     selected_language_index = language_choices.index(selected_language)
-
     # Utiliser cet indice pour obtenir le code de langue correspondant dans language_codes
     selected_language_code = language_codes[selected_language_index]
 
-if selected_language_code != "---":
-    filters.append(f"m.language = '{selected_language_code}'")
-   
+    if selected_language_code != "---":
+        filters.append(f"m.language = '{selected_language_code}'")
+       
     if selected_genre != "All":
     # Si le genre sélectionné contient une barre verticale, on considère chacun des genres séparément
         if "|" in selected_genre:
