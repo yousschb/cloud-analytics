@@ -138,7 +138,7 @@ def build_query(movie_name, selected_genre, selected_language, average_rating, r
             
     # Récupérer le code de langue correspondant
     language_codes = ["---", "en", "fr", "ja", "it", "de", "es", "sv", "fi", "zh", "ru"]
-    selected_language_code = language_codes[language_choices.index(selected_language)]
+    selected_language_code = language_codes[selected_language.index(selected_language)]
 
     if selected_language_code != "All":
         filters.append(f"m.language = '{selected_language_code[:2]}'")
