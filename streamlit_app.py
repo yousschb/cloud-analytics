@@ -38,7 +38,7 @@ def main():
     movie_name = st.text_input("Enter keywords of the movie name:")
 
     # Liste déroulante pour sélectionner le genre de film
-    genre_choices = ["---", "Action", "Adventure", "Animation", "Children", "Comedy", "Crime", "Documentary", "Drama", "Fantasy", "Film-Noir", "Horror", "IMAX", "Musical", "Mystery", "Romance", "Sci-Fi", "Thriller", "War", "Western"]
+    genre_choices = ["All", "Action", "Adventure", "Animation", "Children", "Comedy", "Crime", "Documentary", "Drama", "Fantasy", "Film-Noir", "Horror", "IMAX", "Musical", "Mystery", "Romance", "Sci-Fi", "Thriller", "War", "Western"]
     selected_genre = st.selectbox("Select genre", genre_choices)
 
     # Curseur pour sélectionner la note moyenne
@@ -84,8 +84,6 @@ def main():
                             if clean_movie_title.lower() == ''.join(e for e in row_tmdb_id.title if e.isalnum() or e.isspace()).strip().lower():
                                 tmdb_id = row_tmdb_id.tmdbId
                                 break
-
-
 
                         if tmdb_id:
                             movie_details = get_movie_details(tmdb_id)
@@ -134,7 +132,7 @@ def build_query(movie_name, selected_genre, average_rating, release_year):
     
 
         
-    if selected_genre != "---":
+    if selected_genre != "All":
     # Si le genre sélectionné contient une barre verticale, on considère chacun des genres séparément
         if "|" in selected_genre:
             selected_genres = selected_genre.split("|")
