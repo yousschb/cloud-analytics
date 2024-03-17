@@ -25,6 +25,10 @@ def get_movie_details(tmdb_id):
         return None
 
 def main():
+
+    # Ajouter le logo FindYourFilm depuis Google Drive
+    st.image("https://drive.google.com/uc?export=download&id=16EdHflLO4eJTsRNCYhfn48ILH5njeYbo", width=200)
+
     # Zone de recherche de titre de film
     movie_name = st.text_input("Enter keywords of the movie name:")
 
