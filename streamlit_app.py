@@ -112,8 +112,8 @@ def main():
             st.write("No movie found matching the provided keywords.")
         else:
             st.write("Select a movie to view details:")
-            for selected_movie in movie_options:
-                if st.button(selected_movie):  # Bouton pour chaque titre de film
+            for index, selected_movie in enumerate(movie_options):
+                if st.button(selected_movie, key=f"button_{index}"):  # Utilisation de l'index pour créer une clé unique
                     # Recherche du tmdb_id correspondant au nom du film sélectionné
                     query = f"""
                         SELECT tmdbId
