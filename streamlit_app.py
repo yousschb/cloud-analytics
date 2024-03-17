@@ -96,7 +96,7 @@ def build_query(movie_name, selected_genre, average_rating, release_year):
     base_query = """
         SELECT m.title, AVG(r.rating) as avg_rating
         FROM `caa-assignement-1-417215.Movies.Infos` AS m
-        JOIN `caa-assignement-1-417215.Movies.ratings` AS r ON m.movieId = r.movieId
+        JOIN `caa-assignement-1-417215.Movies.ratings` AS r ON m.tmdbId = r.movieId
         WHERE 1=1
         """
     # Ajouter les filtres en fonction des entrées de l'utilisateur
