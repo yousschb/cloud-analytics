@@ -102,7 +102,7 @@ def main():
                                 # Afficher les informations du film dans la deuxième colonne
                                 col2.write(f"**Title:** {movie_details['title']}")
                                 col2.write(f"**Overview:** {movie_details['overview']}")
-                                col2.write(f"**Release Date:** {movie_details['release_date']}")
+                                col2.write(f"**Release Date:** {movie_details['release_date']}") 
                                 col2.write(f"**Language:** {movie_details['original_language']}")
                                 col2.write(f"**Genres:** {', '.join(genre['name'] for genre in movie_details['genres'])}")
 
