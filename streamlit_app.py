@@ -137,10 +137,12 @@ def build_query(movie_name, selected_genre, selected_language, average_rating, r
             filters.append(keyword_conditions[0])
         
             
-    # Définir les codes de langue correspondant dans le même ordre que les langues
+   # Définir les codes de langue correspondant dans le même ordre que les langues
     language_codes = ["---", "en", "fr", "ja", "it", "de", "es", "sv", "fi", "zh", "ru"]
+
     # Récupérer l'indice de la langue sélectionnée dans language_choices
     selected_language_index = language_choices.index(selected_language)
+
     # Utiliser cet indice pour obtenir le code de langue correspondant dans language_codes
     selected_language_code = language_codes[selected_language_index]
 
